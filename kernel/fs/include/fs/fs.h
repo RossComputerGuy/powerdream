@@ -1,6 +1,7 @@
 #pragma once
 
 #include <kernel/blkdev.h>
+#include <sys/types.h>
 #include <kos/fs.h>
 
 #define PD_FS_PSEUDO 0

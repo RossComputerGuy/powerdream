@@ -1,7 +1,7 @@
 #pragma once
 
 #include <kos/thread.h>
-#include <kernel/types.h>
+#include <sys/types.h>
 #include <sys/queue.h>
 
 struct pd_process;
