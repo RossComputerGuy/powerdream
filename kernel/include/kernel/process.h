@@ -2,11 +2,17 @@
 
 #include <kos/thread.h>
 #include <kernel/types.h>
+#include <sys/queue.h>
+
+struct pd_process;
 
 /**
  * PowerDream Process
  */
-typedef struct {
+typedef struct pd_process {
+  /* Process list handle */
+  SLIST_ENTRY(pd_process) p_list;
+
   /* Process ID */
   pid_t id;
   
@@ -42,3 +48,17 @@ pid_t pd_process_create(pd_process_t** proc, void* (entry)(void* param), void* p
  * @param[out] proc The pointer to store and use for the process
  */
 void pd_process_destroy(pd_process_t** proc);
+
+/**
+ * Get the current process
+ *
+ * @return The current process or NULL
+ */
+pd_process_t* pd_process_getcurr();
+
+/**
+ * Get the PID of the current process
+ *
+ * @return The current process ID or 0
+ */
+pid_t getpid();
