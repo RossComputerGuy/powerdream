@@ -14,11 +14,6 @@ static void handle_syscall(irq_t source, irq_context_t* context) {
   }
 }
 
-int syscall(int i, void* p1, void* p2, void* p3, void* p4, void* p5, void* p6, void* p7, void* p8, void* p9, void* p10) {
-
-  return 0;
-}
-
 void pd_syscalls_init() {
   memset(syscall_table, 0, sizeof(syscall_table));
   irq_set_handler(EXC_IRQ0, handle_syscall);
