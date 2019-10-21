@@ -20,9 +20,9 @@ void pd_syscalls_init() {
 
   /* Setup the system call table */
   syscall_table[SYS_getpid] = getpid;
-  syscall_table[SYS_getcwd] = getcwd;
+  syscall_table[SYS_getcwd] = _getcwd;
   syscall_table[SYS_sigret] = sigret;
-  syscall_table[SYS_signal] = signal;
+  syscall_table[SYS_signal] = _signal;
   syscall_table[SYS_kill] = kill;
 
   /* Set the system call handler */

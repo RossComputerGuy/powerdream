@@ -41,6 +41,7 @@ pid_t pd_process_create(pd_process_t** proc, void* (*entry)(void* param), void* 
   (*proc)->uid = 0;
   memset((*proc)->signal_handlers, 0, sizeof((*proc)->signal_handlers));
   memset(&(*proc)->saved_context, 0, sizeof(irq_context_t));
+  memset(&(*proc)->files, 0, sizeof((*proc)->files));
 
   /* Check if the current process exists */
   pd_process_t* curr_proc = pd_process_getcurr();
@@ -121,7 +122,7 @@ pid_t getpid() {
   return curr_proc == NULL ? 0 : curr_proc->id;
 }
 
-int getcwd(char* buf, size_t size) {
+int _getcwd(char* buf, size_t size) {
   pd_process_t* curr_proc = pd_process_getcurr();
   if (curr_proc == NULL) return -ESRCH;
   if (buf == NULL) return -EINVAL;
@@ -137,7 +138,7 @@ int sigret() {
   return pd_process_sigret(&curr_proc);
 }
 
-int signal(int sig, void (*func)(int)) {
+int _signal(int sig, void (*func)(int)) {
   pd_process_t* curr_proc = pd_process_getcurr();
   if (curr_proc == NULL) return -ESRCH;
   if (sig < 0 || sig >= SIGNAL_MAX) return -EINVAL;

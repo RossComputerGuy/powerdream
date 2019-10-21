@@ -1,6 +1,7 @@
 #pragma once
 
 #include <arch/irq.h>
+#include <kernel/file.h>
 #include <kernel/signal.h>
 #include <kos/thread.h>
 #include <sys/types.h>
@@ -38,6 +39,9 @@ typedef struct pd_process {
 
   /* The context that was saved before a signal */
   irq_context_t saved_context;
+
+  /* Files opened by the process */
+  pd_file_t files[OPEN_MAX];
 } pd_process_t;
 
 /**
@@ -103,7 +107,7 @@ pid_t getpid();
  * @param[in] size Number of bytes to write into buf from the path.
  * @return Negative errno number on error or the number of bytes that were written.
  */
-int getcwd(char* buf, size_t size);
+int _getcwd(char* buf, size_t size);
 
 /**
  * Exists from the signal handler in the current process.
@@ -119,7 +123,7 @@ int sigret();
  * @param[in] func The function pointer which will handle the signal.
  * @return Negative errno number on error or 0 on succes.
  */
-int signal(int sig, void (*func)(int));
+int _signal(int sig, void (*func)(int));
 
 /**
  * Sends a signal to a process

@@ -5,3 +5,5 @@
 #define EPERM 3
 #define EINVAL 4
 #define ERANGE 5
+#define EACCES 6
+#define ENAMETOOLONG 7
