@@ -1,7 +1,7 @@
 set(CMAKE_SYSTEM_PROCESSOR sh4)
 
-set(CMAKE_C_COMPILER /opt/toolchains/dc/kos/utils/gnu_wrappers/kos-cc)
-set(CMAKE_CXX_COMPILER /opt/toolchains/dc/kos/utils/gnu_wrappers/kos-c++)
+find_program(CMAKE_C_COMPILER kos-cc)
+find_program(CMAKE_CXX_COMPILER kos-c++)
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
