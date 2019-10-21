@@ -1,3 +1,3 @@
 # PowerDream
 
-Unix-like operating system for the Sega Dreamcast.
+Unix-like modular operating system for the Sega Dreamcast.
