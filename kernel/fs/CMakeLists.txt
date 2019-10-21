@@ -7,4 +7,4 @@ project(kernel-fs)
 include_directories("${PROJECT_SOURCE_DIR}/include")
 
 add_compile_definitions("INTERNAL_FS")
-add_library(kernel-fs STATIC src/fs.c)
+#add_library(kernel-fs STATIC)

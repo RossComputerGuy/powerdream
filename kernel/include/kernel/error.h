@@ -7,3 +7,4 @@
 #define ERANGE 5
 #define EACCES 6
 #define ENAMETOOLONG 7
+#define EEXIST 8
