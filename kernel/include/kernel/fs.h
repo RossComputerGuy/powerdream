@@ -103,6 +103,15 @@ pd_mountpoint_t* pd_mountpoint_fromdev(dev_t dev);
 pd_mountpoint_t* pd_mountpoint_fromsrc(const char* source);
 
 /**
+ * Resolves a global path
+ *
+ * @param[out] inode The pointer to store the resolved inode
+ * @param[in] path The path to resolve
+ * @return A negative errno number if errors, 0 on success
+ */
+int pd_resolve_path(pd_inode_t** inode, const char* path);
+
+/**
  * Register a new filesystem
  *
  * @param[in] fs The filesystem to register.
@@ -143,6 +152,14 @@ int pd_fs_umount(pd_fs_t* fs, const char* target);
  * @return 0 on success, negative errno on failure.
  */
 int mount(const char* source, const char* target, const char* fstype, unsigned long flags, const void* data);
+
+/**
+ * Unmount a filesystem
+ *
+ * @param[in] target The mount point target to remove.
+ * @return 0 on success, negative errno on failure.
+ */
+int umount(const char* target);
 
 /**
  * Initialize the filesystems

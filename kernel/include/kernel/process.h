@@ -9,6 +9,8 @@
 
 struct pd_process;
 
+#define OPEN_MAX 1024
+
 /**
  * PowerDream Process
  */

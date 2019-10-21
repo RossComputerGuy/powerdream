@@ -1,7 +1,8 @@
 #pragma once
 
-#include <kernel/limits.h>
 #include <kernel/types.h>
+#include <kos/limits.h>
+#include <sys/dirent.h>
 #include <sys/types.h>
 
 struct pd_inode;
@@ -17,6 +18,8 @@ typedef struct {
   size_t (*write)(struct pd_inode* inode, struct pd_file* file, const char* buff, size_t size);
   int (*ioctl)(struct pd_inode* inode, struct pd_file* file, unsigned int request, unsigned long argsize, void** arg);
   off_t (*seek)(struct pd_inode* inode, struct pd_file* file, off_t offset, int whence);
+  int (*readdir)(struct pd_inode* inode, struct dirent* dirent, unsigned int index);
+  int (*readnode)(struct pd_inode* inode, struct pd_inode** cinode, unsigned int index);
 } pd_file_opts_t;
 
 /**

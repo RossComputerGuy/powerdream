@@ -1,9 +1,8 @@
 #pragma once
 
 #include <kernel/file.h>
+#include <kos/limits.h>
 #include <sys/types.h>
-#include <limits.h>
-#include <kernel/limits.h>
 
 /**
  * PowerDream Inode
@@ -85,3 +84,13 @@ int pd_inode_close(pd_inode_t* inode, pd_file_t* file);
  * @return Returns negative errno codes when errors, 0 will be returned on success.
  */
 int pd_inode_create(pd_inode_t** inode, const char* name);
+
+/**
+ * Resolves a child inode from a top parent
+ *
+ * @param[in] root The root to search in
+ * @param[out] inode The pointer to store the child
+ * @param[in] path The path to resolve
+ * @return Returns negative error codes when errors, 0 will be returned on success.
+ */
+int pd_inode_resolve_path(pd_inode_t* root, pd_inode_t** inode, const char* path);

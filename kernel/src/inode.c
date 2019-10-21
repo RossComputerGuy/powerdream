@@ -30,3 +30,28 @@ int pd_inode_create(pd_inode_t** inode, const char* name) {
   (*inode)->ino = next_inode++;
   return 0;
 }
+
+int pd_inode_resolve_path(pd_inode_t* root, pd_inode_t** inode, const char* path) {
+  if (root->opts.readnode == NULL) return -EINVAL;
+  char* p = strtok((char*)path, "/");
+  if (p == NULL) return 0;
+  size_t index = 0;
+  int r = 0;
+  pd_inode_t* parent = NULL;
+  pd_inode_t* tmp = NULL;
+  while ((r = root->opts.readnode(root, &parent, index++)) >= 0) {
+    if (!S_ISDIR(parent->mode)) return -ENOTDIR;
+    if (!strcmp((*inode)->name, p)) {
+      if (strlen(path + strlen(p) + 1) == 0) {
+        *inode = parent;
+        return 0;
+      } else if ((r = pd_inode_resolve_path(parent, &tmp, path + strlen(p))) >= 0) {
+        if (strlen(path + strlen(p) + 1) == 0) {
+          *inode = tmp;
+          return 0;
+        }
+      }
+    }
+  }
+  return -ENOENT;
+}

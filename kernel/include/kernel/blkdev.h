@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kernel/limits.h>
+#include <kos/limits.h>
 #include <sys/types.h>
 #include <sys/queue.h>
 #include <string.h>

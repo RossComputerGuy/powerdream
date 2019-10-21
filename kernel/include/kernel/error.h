@@ -9,3 +9,5 @@
 #define ENAMETOOLONG 7
 #define EEXIST 8
 #define ENODEV 9
+#define ENOENT 10
+#define ENOTDIR 11

@@ -27,6 +27,7 @@ void pd_syscalls_init() {
   syscall_table[SYS_kill] = kill;
 
   syscall_table[SYS_mount] = mount;
+  syscall_table[SYS_umount] = umount;
 
   /* Set the system call handler */
   irq_set_handler(EXC_IRQ0, handle_syscall);

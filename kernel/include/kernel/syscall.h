@@ -7,8 +7,9 @@
 #define SYS_kill 4
 
 #define SYS_mount 5
+#define SYS_umount 6
 
-#define SYSCALL_MAX 6
+#define SYSCALL_MAX 7
 
 /**
  * Setup the system calls

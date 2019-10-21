@@ -52,6 +52,12 @@ pd_mountpoint_t* pd_mountpoint_fromsrc(const char* source) {
   return NULL;
 }
 
+int pd_resolve_path(pd_inode_t** inode, const char* path) {
+  pd_mountpoint_t* rootmp = pd_mountpoint_fromtarget("/");
+  if (rootmp == NULL) return -ENOENT;
+  return pd_inode_resolve_path(rootmp, inode, path);
+}
+
 int pd_fs_register(pd_fs_t* fs) {
   if (pd_fs_fromname(fs->name) != NULL) return -EEXIST;
   SLIST_INSERT_HEAD(&filesystems, fs, f_list);
@@ -70,6 +76,7 @@ int pd_fs_mount(pd_fs_t* fs, pd_blkdev_t* dev, const char* source, const char* t
   if (dev != NULL) mp->dev = dev->dev;
   if (source != NULL) mp->source = source;
 
+  mp->fs = fs->name;
   mp->target = target;
   mp->flags = flags;
 
@@ -105,6 +112,21 @@ int mount(const char* source, const char* target, const char* fstype, unsigned l
   if (fs == NULL) return -ENODEV;
   // TODO: get device from source
   return pd_fs_mount(fs, NULL, source, target, flags, data);
+}
+
+int umount(const char* target) {
+  pd_process_t* curr_proc = pd_process_getcurr();
+  if (curr_proc != NULL) {
+    if (curr_proc->uid > 0 && curr_proc->gid > 0) return -EPERM;
+  }
+
+  pd_mountpoint_t* mp = pd_mountpoint_fromtarget(target);
+  if (mp == NULL) return -EINVAL;
+  
+  pd_fs_t* fs = pd_fs_fromname(mp->fs);
+  if (fs == NULL) return -ENODEV;
+
+  return pd_fs_umount(fs, target);
 }
 
 void pd_fs_init() {
