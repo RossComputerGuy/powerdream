@@ -8,3 +8,4 @@
 #define EACCES 6
 #define ENAMETOOLONG 7
 #define EEXIST 8
+#define ENODEV 9

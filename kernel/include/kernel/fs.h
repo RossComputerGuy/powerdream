@@ -24,9 +24,10 @@ typedef struct pd_fs {
    * @param[in] source The source path, will be NULL if the device argument is set.
    * @param[in] target The target mount path.
    * @param[in] flags The mount flags used.
+   * @param[in] data Some data
    * @return Returns 0 on success or an errno code on error.
    */
-  int (*mount)(pd_inode_t** inode, pd_blkdev_t* dev, const char* source, const char* target, unsigned long flags);
+  int (*mount)(pd_inode_t** inode, pd_blkdev_t* dev, const char* source, const char* target, unsigned long flags, const void* data);
 
   /**
    * A function pointer to unmount a filesystem inode for a specific device or path
@@ -117,9 +118,31 @@ int pd_fs_register(pd_fs_t* fs);
  * @param[in] source The source to mount, can be NULL
  * @param[in] target The resulting mount path
  * @param[in] flags The mount flags
+ * @param[in] data Data to send to the filesystem
  * @return 0 on success, negative errno on failure
  */
-int pd_fs_mount(pd_fs_t* fs, pd_blkdev_t* dev, const char* source, const char* target, unsigned long flags);
+int pd_fs_mount(pd_fs_t* fs, pd_blkdev_t* dev, const char* source, const char* target, unsigned long flags, const void* data);
+
+/**
+ * Unmounts a filesystem
+ *
+ * @param[in] fs The filesystem to unmount
+ * @param[in] target The mountpoint to remove
+ * @return 0 on success, negative errno on failure
+ */
+int pd_fs_umount(pd_fs_t* fs, const char* target);
+
+/**
+ * Mounts a filesystem
+ *
+ * @param[in] source The source of the mount point
+ * @param[in] target The target of the mount point
+ * @param[in] fstype The type of filesystem to mount
+ * @param[in] flags The mount flags
+ * @param[in] data Some data to use when mounting
+ * @return 0 on success, negative errno on failure.
+ */
+int mount(const char* source, const char* target, const char* fstype, unsigned long flags, const void* data);
 
 /**
  * Initialize the filesystems

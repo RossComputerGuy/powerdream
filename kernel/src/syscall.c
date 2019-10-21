@@ -1,4 +1,5 @@
 #include <arch/irq.h>
+#include <kernel/fs.h>
 #include <kernel/process.h>
 #include <kernel/syscall.h>
 #include <string.h>
@@ -24,6 +25,8 @@ void pd_syscalls_init() {
   syscall_table[SYS_sigret] = sigret;
   syscall_table[SYS_signal] = _signal;
   syscall_table[SYS_kill] = kill;
+
+  syscall_table[SYS_mount] = mount;
 
   /* Set the system call handler */
   irq_set_handler(EXC_IRQ0, handle_syscall);
