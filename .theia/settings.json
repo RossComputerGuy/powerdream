@@ -1,0 +1,13 @@
+{
+   "cpp.buildConfigurations": [
+      {
+         "name": "",
+         "directory": ""
+      },
+      {
+         "name": "",
+         "directory": ""
+      }
+   ],
+   "cpp.clangdArgs": "-I kernel/include -I kernel/fs/include -I toolchain/kos/include"
+}
