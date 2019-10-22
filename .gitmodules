@@ -1,0 +1,3 @@
+[submodule "toolchain/kos"]
+	path = toolchain/kos
+	url = https://github.com/KallistiOS/KallistiOS
