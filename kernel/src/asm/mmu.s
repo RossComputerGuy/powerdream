@@ -1,6 +1,6 @@
 .text
-.globl _pd_mmu_reset_itlb
-_pd_mmu_reset_itlb:
+.globl pd_mmu_reset_itlb
+pd_mmu_reset_itlb:
   mov.l	mraddr,r0
 	mov.l	p2mask,r1
 	or r1,r0

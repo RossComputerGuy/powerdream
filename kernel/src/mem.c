@@ -1,5 +1,6 @@
 #include <kernel/mem.h>
 #include <kernel/mmu.h>
+#include <string.h>
 
 /* Basic allocator which is used in the early kernel booting */
 extern unsigned long end;
@@ -28,3 +29,5 @@ void pd_mm_init() {
 void* kmalloc(size_t size) {
   return NULL;
 }
+
+void kfree(void* ptr) {}

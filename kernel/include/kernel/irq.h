@@ -47,3 +47,8 @@ int pd_irq_set_handler(uint32_t code, pd_irq_handler_t handler);
   * @return The IRQ handler for the IRQ, will be NULL if code is invalid or if there's no handler installed
   */
 pd_irq_handler_t pd_irq_get_handler(uint32_t code);
+
+/**
+ * Initialize the IRQs
+ */
+void pd_irq_init();

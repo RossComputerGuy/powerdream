@@ -1,5 +1,8 @@
 #include <kernel/error.h>
 #include <kernel/irq.h>
+#include <string.h>
+
+extern pd_irq_context_t* pd_irq_srt_addr; 
 
 static pd_irq_handler_t irq_handlers[0x100];
 static pd_irq_handler_t trapa_handlers[0x100];
@@ -23,3 +26,11 @@ int pd_trapa_set_handler(uint32_t code, pd_irq_handler_t handler) {
   trapa_handlers[code] = handler;
   return 0;
 }
+
+void pd_irq_handle_exception(int code) {}
+
+pd_irq_context_t* pd_irq_get_context() {
+  return pd_irq_srt_addr;
+}
+
+void pd_irq_init() {}

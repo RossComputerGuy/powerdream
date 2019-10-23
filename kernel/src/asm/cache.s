@@ -1,7 +1,7 @@
 .text
 
-.globl _pd_icache_flush_range
-_pd_icache_flush_range:
+.globl pd_icache_flush_range
+pd_icache_flush_range:
 	mov.l	fraddr,r0
 	mov.l	p2mask,r1
 	or r1,r0
@@ -59,8 +59,8 @@ addrarray: .long 0xf0000000
 entrymask: .long 0x1fe0
 validmask: .long 0xfffffc00
 
-.globl _pd_dcache_inval_range
-_pd_dcache_inval_range:
+.globl pd_dcache_inval_range
+pd_dcache_inval_range:
 	add	r4,r5
 	mov.l	l1align,r0
 	and	r0,r4
@@ -90,8 +90,8 @@ pd_dinval_loop:
 	rts
 	nop
 
-.globl _pd_dcache_flush_range
-_pd_dcache_flush_range:
+.globl pd_dcache_flush_range
+pd_dcache_flush_range:
 	add	r4,r5
 	mov.l	l1align,r0
 	and	r0,r4

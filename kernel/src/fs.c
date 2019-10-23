@@ -1,6 +1,6 @@
 #include <kernel/error.h>
 #include <kernel/fs.h>
-#include <kernel/mmu.h>
+#include <kernel/mem.h>
 #include <kernel/process.h>
 #include <string.h>
 
@@ -26,10 +26,10 @@ pd_mountpoint_t* pd_mountpoint_fromtarget(const char* target) {
   return NULL;
 }
 
-pd_mountpoint_t* pd_mountpoint_fromdev(dev_t dev) {
+pd_mountpoint_t* pd_mountpoint_fromdev(const char* dev) {
   pd_mountpoint_t* mountpoint;
   PD_SLIST_FOREACH(mountpoint, &mountpoints, m_list) {
-    if (mountpoint->dev == dev) return mountpoint;
+    if (!strcmp(mountpoint->dev, dev)) return mountpoint;
   }
   return NULL;
 }
@@ -55,7 +55,7 @@ int pd_fs_register(pd_fs_t* fs) {
 }
 
 int pd_fs_mount(pd_fs_t* fs, pd_blkdev_t* dev, const char* source, const char* target, unsigned long flags, const void* data) {
-  if (dev != NULL && pd_mountpoint_fromdev(dev->dev) != NULL) return -EACCES;
+  if (dev != NULL && pd_mountpoint_fromdev(dev->name) != NULL) return -EACCES;
   if (source != NULL && pd_mountpoint_fromsrc(source) != NULL) return -EACCES;
   if (pd_mountpoint_fromtarget(target) != NULL) return -EACCES;
 
@@ -63,7 +63,7 @@ int pd_fs_mount(pd_fs_t* fs, pd_blkdev_t* dev, const char* source, const char* t
   if (mp == NULL) return -ENOMEM;
   memset(mp, 0, sizeof(pd_mountpoint_t));
 
-  if (dev != NULL) mp->dev = dev->dev;
+  if (dev != NULL) strcpy((char*)mp->dev, dev->name);
   if (source != NULL) mp->source = source;
 
   mp->fs = fs->name;

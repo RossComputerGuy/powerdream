@@ -1,6 +1,6 @@
 #include <kernel/error.h>
 #include <kernel/inode.h>
-#include <kernel/mmu.h>
+#include <kernel/mem.h>
 #include <string.h>
 
 static ino_t next_inode = 0;

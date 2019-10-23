@@ -1,6 +1,6 @@
-.globl _pd_irq_save_regs
-_pd_irq_save_regs:
-  mov.l _pd_irq_srt_addr,r0
+.globl pd_irq_save_regs
+pd_irq_save_regs:
+  mov.l pd_irq_srt_addr,r0
 	add	#0x20,r0
 	stc.l	r7_bank,@-r0
 	stc.l	r6_bank,@-r0
@@ -50,22 +50,22 @@ _pd_irq_save_regs:
 	fmov.s fr2,@-r0
 	fmov.s fr1,@-r0
 
-.globl _pd_irq_force_return
-_pd_irq_force_return:
+.globl pd_irq_force_return
+pd_irq_force_return:
 	mov.l	_pd_irqfr_or,r1
 	stc	sr,r0
 	or	r1,r0
 	ldc	r0,sr
-	bra	_pd_save_regs_finish
+	bra	pd_save_regs_finish
 	nop
 	
 .align 2
 _pd_irqfr_or: .long 0x20000000
 pd_stkaddr: .long krn_stack
 
-.globl _pd_save_regs_finish
-_pd_save_regs_finish:
-	mov.l	_pd_irq_srt_addr, r1
+.globl pd_save_regs_finish
+pd_save_regs_finish:
+	mov.l	pd_irq_srt_addr, r1
 	ldc.l	@r1+,r0_bank
 	ldc.l	@r1+,r1_bank
 	ldc.l	@r1+,r2_bank
@@ -138,9 +138,9 @@ _pd_save_regs_finish:
 	nop
 	
 .align 2
-.globl _pd_irq_srt_addr
-_pd_irq_srt_addr: .long 0
-pd_hdl_except: .long _pd_irq_handle_exception
+.globl pd_irq_srt_addr
+pd_irq_srt_addr: .long 0
+pd_hdl_except: .long pd_irq_handle_exception
 
 .text
 .align 2
@@ -160,7 +160,7 @@ pd_tlb_miss_hnd:
 	cmp/eq	r0,r1
 	bt pd_tmh_doit
 
-	bra _pd_irq_save_regs
+	bra pd_irq_save_regs
 	mov	#2,r4
 
 pd_tmh_doit:
@@ -168,7 +168,7 @@ pd_tmh_doit:
 	mov.l	@r0,r0
 	cmp/pz r0
 	bt pd_tmh_clear
-	bra _pd_irq_save_regs
+	bra pd_irq_save_regs
 	mov	#2,r4
 
 pd_tmh_clear:
@@ -188,11 +188,11 @@ pd_tmh_clear:
 	nop
 
 .align 2
-pd_tmh_shortcut_addr: .long _pd_mmu_shortcut_ok
+pd_tmh_shortcut_addr: .long pd_mmu_shortcut_ok
 pd_tmh_stack_save_addr: .long pd_tmh_stack_save
 pd_tmh_stack_save: .long 0
 pd_tmh_temp_stack_addr: .long pd_tmh_temp_stack
-pd_tmh_gen_miss_addr: .long _pd_mmu_gen_tlb_miss
+pd_tmh_gen_miss_addr: .long pd_mmu_gen_tlb_miss
 
 .data
 .space	256
@@ -208,7 +208,7 @@ _pd_irq_vma_table:
 	
 _pd_vma_table_100:
 	nop
-	bra	_pd_irq_save_regs
+	bra	pd_irq_save_regs
 	mov	#1,r4
 	
 	.rep 0x300 - 6
@@ -217,7 +217,7 @@ _pd_vma_table_100:
 
 _pd_vma_table_400:
 	nop
-	bra	_pd_irq_save_regs
+	bra	pd_irq_save_regs
 	mov	#2,r4
 
 	.rep 0x200 - 6
@@ -226,11 +226,11 @@ _pd_vma_table_400:
 
 _pd_vma_table_600:
 	nop
-	bra	_pd_irq_save_regs
+	bra	pd_irq_save_regs
 	mov	#3,r4
 
-.globl _pd_irq_disable
-_pd_irq_disable:
+.globl pd_irq_disable
+pd_irq_disable:
 	mov.l	_pd_irqd_and,r1
 	mov.l	_pd_irqd_or,r2
 	stc	sr,r0

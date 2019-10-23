@@ -1,3 +1,4 @@
+#include <kernel/error.h>
 #include <kernel/irq.h>
 #include <kernel/sercon.h>
 #include <kernel/types.h>
@@ -34,7 +35,7 @@ int pd_sercon_putc(const char c) {
   while (!(SCFSR2 & 0x20) && timeout > 0) timeout--;
 
   if (timeout <= 0) {
-    serinted = 0;
+    serinited = 0;
     return -EIO;
   }
 

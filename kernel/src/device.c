@@ -1,7 +1,8 @@
 #include <kernel/device.h>
 #include <kernel/error.h>
+#include <string.h>
 
-PD_LIST_HEAD(devices, pd_dev_t);
+PD_SLIST_HEAD(devices, pd_dev_t);
 
 static struct devices devices;
 

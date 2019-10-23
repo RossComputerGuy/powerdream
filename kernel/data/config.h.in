@@ -1,3 +1,5 @@
 #pragma once
 
 #define PD_KERNEL_VERSION "@PROJECT_VERSION@"
+#define PD_SERIAL_BAUD @SERIAL_BAUD@
+#define PD_SERIAL_FIFO @SERIAL_FIFO@

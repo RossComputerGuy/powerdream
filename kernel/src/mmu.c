@@ -1,3 +1,6 @@
+#include <kernel/cache.h>
+#include <kernel/irq.h>
+#include <kernel/mem.h>
 #include <kernel/mmu.h>
 #include <string.h>
 
@@ -20,8 +23,9 @@ static volatile uint32_t* const mmucr = (uint32_t*)(0xff000010);
 
 pd_mmu_context_t* pd_mmu_ctx_curr = NULL;
 
-static int mmu_shortcut_ok = 0;
+int pd_mmu_shortcut_ok = 0;
 static pd_mmu_mapfunc_t map_func;
+static int last_urc;
 
 /* Physical hardware management */
 static void mmu_ldtlb(int asid, uint32_t virt, uint32_t phys, int sz, int pr, int c, int d, int sh, int wt) {
@@ -65,13 +69,13 @@ static pd_mmu_page_t* map_virt(pd_mmu_context_t* context, int virtpage) {
 
 void pd_mmu_use_table(pd_mmu_context_t* context) {
   pd_mmu_ctx_curr = context;
-  mmu_shortcut_ok = (map_func == map_virt);
+  pd_mmu_shortcut_ok = (map_func == map_virt);
 }
 
 void pd_mmu_context_create(pd_mmu_context_t** context, int asid) {
   (*context) = pd_basic_alloc(sizeof(pd_mmu_context_t));
-  context->asid = asid;
-  for (int i = 0; i < PD_MMU_PAGES; i++) context->sub[i] = NULL;
+  (*context)->asid = asid;
+  for (int i = 0; i < PD_MMU_PAGES; i++) (*context)->sub[i] = NULL;
 }
 
 int pd_mmu_virt2phys(pd_mmu_context_t* context, int virtpage) {
@@ -200,7 +204,7 @@ int pd_mmu_copyv(pd_mmu_context_t* context1, struct iovec* iov1, int iovcnt1, pd
   uint32_t dst = dstptr;
   int dstkrn = 1;
   if (!(dstptr & 0x80000000)) {
-    dstpage = map_virt(context2, dstrptr >> PD_PAGESIZE_BITS);
+    dstpage = map_virt(context2, dstptr >> PD_PAGESIZE_BITS);
     // TODO: if (dstpage == NULL) panic
     dst = (dstpage->physical << PD_PAGESIZE_BITS) | (dstptr & PD_PAGEMASK);
     dstkrn = 0;
@@ -273,10 +277,12 @@ int pd_mmu_copyv(pd_mmu_context_t* context1, struct iovec* iov1, int iovcnt1, pd
   return copied;
 }
 
+void pd_mmu_gen_tlb_miss(const char* what, uint32_t source, pd_irq_context_t* context) {}
+
 void pd_mmu_init() {
   last_urc = 0;
   map_func = map_virt;
-  mmu_shortcut_ok = 0;
+  pd_mmu_shortcut_ok = 0;
 
   // TODO: install IRQ handlers
 

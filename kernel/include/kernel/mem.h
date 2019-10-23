@@ -27,3 +27,10 @@ void pd_mm_init();
   * @return An allocated memory address
   */
 void* kmalloc(size_t size);
+
+/**
+ * Frees memory allocated for the kernel with the MMU
+ *
+ * @param[in] ptr The pointer allocated by the MMU
+ */
+void kfree(void* ptr);

@@ -30,4 +30,10 @@ typedef struct pd_dev {
   */
 pd_dev_t* pd_dev_fromname(const char* name);
 
+/**
+ * Registers a device
+ *
+ * @param[in] device The device to register
+ * @return Zero or a negative errno code
+ */
 int pd_dev_register(pd_dev_t* device);

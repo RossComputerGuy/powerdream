@@ -5,8 +5,8 @@ set(CMAKE_TOOLCHAIN_FILE toolchain.cmake)
 project(pd-kernel C ASM)
 set(PROJECT_VERSION "0.1.0")
 
-set(PD_SERIAL_BAUD 57600)
-set(PD_SERIAL_FIFO 1)
+set(SERIAL_BAUD 57600)
+set(SERIAL_FIFO 1)
 
 configure_file("${PROJECT_SOURCE_DIR}/data/config.h.in" "${PROJECT_BINARY_DIR}/kernel-config.h")
 

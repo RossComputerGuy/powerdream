@@ -1,12 +1,13 @@
 #include <kernel/dev/char.h>
 #include <kernel/error.h>
+#include <string.h>
 
 PD_SLIST_HEAD(chardevs, pd_chardev_t);
 
 static struct chardevs chardevs;
 
 static size_t chardev_read(pd_inode_t* inode, pd_file_t* file, char* buff, size_t size) {
-  pd_chardev_t* chardev = pd_chardev_fromdev(inode->dev);
+  pd_chardev_t* chardev = pd_chardev_fromname(inode->name);
   if (chardev == NULL) return -ENODEV;
   if (chardev->read == NULL) return -EIO;
 
@@ -18,21 +19,21 @@ static size_t chardev_read(pd_inode_t* inode, pd_file_t* file, char* buff, size_
 }
 
 static size_t chardev_write(pd_inode_t* inode, pd_file_t* file, const char* buff, size_t size) {
-  pd_chardev_t* chardev = pd_chardev_fromdev(inode->dev);
+  pd_chardev_t* chardev = pd_chardev_fromname(inode->name);
   if (chardev == NULL) return -ENODEV;
   if (chardev->read == NULL) return -EIO;
 
   size_t w = chardev->write(chardev, file, file->offset, buff, size);
-  if (r < 0) return r;
+  if (w < 0) return w;
 
-  file->offset += r;
-  return r;
+  file->offset += w;
+  return w;
 }
 
 pd_chardev_t* pd_chardev_fromname(const char* name) {
   pd_chardev_t* chardev = NULL;
   PD_SLIST_FOREACH(chardev, &chardevs, c_list) {
-    if (!strcmp(chardev->name, name)) return dev;
+    if (!strcmp(chardev->name, name)) return chardev;
   }
   return NULL;
 }

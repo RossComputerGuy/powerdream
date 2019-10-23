@@ -1,4 +1,5 @@
 #include <kernel/error.h>
+#include <kernel/mem.h>
 #include <kernel/mmu.h>
 #include <kernel/process.h>
 #include <string.h>

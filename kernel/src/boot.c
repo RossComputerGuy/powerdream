@@ -1,4 +1,4 @@
-#include <kernel/blkdev.h>
+#include <kernel/dev/block.h>
 #include <kernel/fs.h>
 #include <kernel/irq.h>
 #include <kernel/mem.h>

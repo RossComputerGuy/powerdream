@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kernel/blkdev.h>
+#include <kernel/dev/block.h>
 #include <kernel/inode.h>
 #include <kernel/list.h>
 #include <kernel/types.h>
@@ -58,7 +58,7 @@ typedef struct pd_mountpoint {
   const char* fs;
 
   /* The device used to mount the filesystem */
-  dev_t dev;
+  const char* dev;
 
   /* The source path used to mount the filesystem */
   const char* source;
@@ -89,10 +89,10 @@ pd_mountpoint_t* pd_mountpoint_fromtarget(const char* target);
 /**
  * Get a mount point by its device
  *
- * @param[in] dev The device to use
+ * @param[in] dev The device name
  * @return A mount point or NULL if it cannot be found
  */
-pd_mountpoint_t* pd_mountpoint_fromdev(dev_t dev);
+pd_mountpoint_t* pd_mountpoint_fromdev(const char* dev);
 
 /**
  * Get a mount point by its source
