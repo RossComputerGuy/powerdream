@@ -33,6 +33,8 @@ pid_t pd_process_create(pd_process_t** proc, void* (*entry)(void* param), void* 
   memset(&(*proc)->saved_context, 0, sizeof(pd_irq_context_t));
   memset(&(*proc)->files, 0, sizeof((*proc)->files));
 
+  pd_mmu_context_create(&(*proc)->mem, 1 + (*proc)->id);
+
   /* TODO: setup context */
 
   /* Check if the current process exists */

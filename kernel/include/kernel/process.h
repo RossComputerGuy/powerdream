@@ -4,6 +4,7 @@
 #include <kernel/irq.h>
 #include <kernel/limits.h>
 #include <kernel/list.h>
+#include <kernel/mmu.h>
 #include <kernel/signal.h>
 #include <kernel/types.h>
 
@@ -28,7 +29,7 @@ typedef struct pd_process {
 
   /* Process ID */
   pid_t id;
-  
+
   /* Parent process's ID */
   pid_t parent_pid;
 
@@ -43,6 +44,8 @@ typedef struct pd_process {
 
   /* Process entry pointer */
   void* entry;
+
+  pd_mmu_context_t* mem;
 
   /* Process context */
   pd_irq_context_t context;

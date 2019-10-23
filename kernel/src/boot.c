@@ -12,6 +12,8 @@ void bootstrap_main() {
   pd_sercon_init();
   pd_irq_init();
   pd_mmu_init();
+  pd_mm_init();
+
   pd_blkdev_init();
   pd_fs_init();
   pd_process_init();

@@ -6,6 +6,13 @@
 
 #define PD_TTY_HASBAUD (1 << 0)
 
+struct winsize {
+	uint16_t ws_row;
+	uint16_t ws_col;
+	uint16_t ws_xpixel;
+  uint16_t ws_ypixel;
+};
+
 struct termios {
 	uint8_t iflag;
 	uint8_t oflag;
@@ -23,6 +30,8 @@ typedef struct pd_tty {
 
   const char name[NAME_MAX];
 
+  int (*getwinsize)(struct pd_tty* tty, uint16_t* row, uint16_t* col, uint16_t* x, uint16_t* y);
+  int (*setwinsize)(struct pd_tty* tty, uint16_t row, uint16_t col, uint16_t x, uint16_t y);
   size_t (*write)(struct pd_tty* tty, const void* buffer, size_t length);
   size_t (*read)(struct pd_tty* tty, void* buffer, size_t length);
 } pd_tty_t;
