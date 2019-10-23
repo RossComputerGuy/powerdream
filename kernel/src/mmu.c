@@ -210,6 +210,59 @@ int pd_mmu_copyv(pd_mmu_context_t* context1, struct iovec* iov1, int iovcnt1, pd
     if (dstcnt < run) run = dstcnt;
 
     memcpy((void*)(dst | 0xa0000000), (void*)(src | 0x80000000), run);
+    pd_dcache_inval_range(dst | 0x80000000, run);
+
+    src += run;
+    srcptr += run;
+    dst += run;
+    dstptr += run;
+    copied += run;
+
+    srccnt -= run;
+
+    if (srccnt <= 0) {
+        srciov++;
+
+        if (srciov >= iovcnt1) break;
+
+        srccnt = iov1[srciov].iov_len;
+        srcptr = (uint32_t)iov1[srciov].iov_base;
+
+        if (!srckrn) {
+            srcpage = map_virt(context1, srcptr >> PD_PAGESIZE_BITS);
+            // TODO: if (srcpage == NULL) panic
+            src = (srcpage->physical << PD_PAGESIZE_BITS) | (srcptr & PD_PAGEMASK);
+        } else src = srcptr;
+    } else {
+        if (!srckrn && (srcptr & ~PD_PAGEMASK) != ((srcptr - run) & ~PD_PAGEMASK)) {
+            srcpage = map_virt(context1, srcptr >> PD_PAGESIZE_BITS);
+            // TODO: if (srcpage == NULL) panic
+            src = (srcpage->physical << PD_PAGESIZE_BITS) | (srcptr - (srcptr & ~PD_PAGEMASK));
+        }
+    }
+
+    dstcnt -= run;
+
+    if (dstcnt <= 0) {
+        dstiov++;
+
+        if (dstiov >= iovcnt2) break;
+
+        dstcnt = iov2[dstiov].iov_len;
+        dstptr = (uint32_t)iov2[dstiov].iov_base;
+
+        if (!dstkrn) {
+          dstpage = map_virt(context2, dstptr >> PD_PAGESIZE_BITS);
+          // TODO: if (dstpage == NULL) panic
+          dst = (dstpage->physical << PD_PAGESIZE_BITS) | (dstptr & PD_PAGEMASK);
+        } else dst = dstptr;
+    } else {
+      if (!dstkrn && (dstptr & ~PD_PAGEMASK) != ((dstptr - run) & ~PD_PAGEMASK)) {
+        dstpage = map_virt(context2, dstptr >> PD_PAGESIZE_BITS);
+        // TODO: if (dstpage == NULL) panic
+        dst = (dstpage->physical << PD_PAGESIZE_BITS) | (dstptr - (dstptr & ~PD_PAGEMASK));
+      }
+    }
   }
   return copied;
 }
