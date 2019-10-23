@@ -45,7 +45,8 @@ typedef struct pd_process {
   /* Process entry pointer */
   void* entry;
 
-  pd_mmu_context_t* mem;
+  /* Process MMU context */
+  pd_mmu_context_t* mem; // NOTE: we may use heaps for this
 
   /* Process context */
   pd_irq_context_t context;
