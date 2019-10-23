@@ -1,5 +1,6 @@
 #pragma once
 
+#include <kernel/io.h>
 #include <kernel/types.h>
 
 #define PD_MMU_TOP_SHIFT 21
@@ -61,7 +62,7 @@ int pd_mmu_virt2phys(pd_mmu_context_t* context, int virtpage);
 void pd_mmu_switch_context(pd_mmu_context_t* context);
 void pd_mmu_page_map(pd_mmu_context_t* context, int virtpage, int physpage, int count, int prot, int cache, int share, int dirty);
 int pd_mmu_copyin(pd_mmu_context_t* context, uint32_t srcaddr, uint32_t srccnt, void* buffer);
-
+int pd_mmu_copyv(pd_mmu_context_t* context1, struct iovec* iov1, int iovcnt1, pd_mmu_context_t* context2, struct iovec* iov2, int iovcnt2);
 
 /**
  * Allocate memory for the kernel

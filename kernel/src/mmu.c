@@ -168,3 +168,20 @@ int pd_mmu_copyin(pd_mmu_context_t* context, uint32_t srcaddr, uint32_t srccnt, 
     copied += run;
   }
 }
+
+int pd_mmu_copyv(pd_mmu_context_t* context1, struct iovec* iov1, int iovcnt1, pd_mmu_context_t* context2, struct iovec* iov2, int iovcnt2) {
+  int srciov = 0;
+  uint32_t srccnt = iov1[srciov].iov_len;
+  uint32_t srcptr = (uint32_t)iov1[srciov].iov_base;
+
+  pd_mmu_page_t* srcpage;
+  uint32_t src = srcptr;
+  int srckrn = 1;
+  if(!(srcptr & 0x80000000)) {
+    srcpage = map_virt(context1, srcptr >> PD_PAGESIZE_BITS);
+    // TODO: if (srcpage == NULL) panic
+    src = (srcpage->physical << PD_PAGESIZE_BITS) | (srcptr & PD_PAGEMASK);
+    srckrn = 0;
+  }
+  return 0;
+}
