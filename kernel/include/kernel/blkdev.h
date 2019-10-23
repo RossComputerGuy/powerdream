@@ -1,8 +1,8 @@
 #pragma once
 
-#include <kos/limits.h>
-#include <sys/types.h>
-#include <sys/queue.h>
+#include <kernel/limits.h>
+#include <kernel/list.h>
+#include <kernel/types.h>
 #include <string.h>
 
 /**
@@ -10,9 +10,9 @@
  */
 typedef struct pd_blkdev {
   /* Block device list handle */
-  SLIST_ENTRY(pd_blkdev) b_list;
+  PD_SLIST_ENTRY(struct pd_blkdev) b_list;
 
-  const char name[PATH_MAX];
+  const char name[NAME_MAX];
   dev_t dev;
   size_t size;
   size_t blkcnt;

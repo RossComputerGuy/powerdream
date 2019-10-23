@@ -2,8 +2,8 @@
 
 #include <kernel/blkdev.h>
 #include <kernel/inode.h>
-#include <sys/types.h>
-#include <sys/queue.h>
+#include <kernel/list.h>
+#include <kernel/types.h>
 
 #define PD_FS_PSEUDO 0
 #define PD_FS_VIRT 1
@@ -14,7 +14,7 @@
  */
 typedef struct pd_fs {
   /* Filesystem list handle */
-  SLIST_ENTRY(pd_fs) f_list;
+  PD_SLIST_ENTRY(struct pd_fs) f_list;
 
   /**
    * A function pointer to mount a filesystem inode for a specific device or path
@@ -49,7 +49,7 @@ typedef struct pd_fs {
  */
 typedef struct pd_mountpoint {
   /* Mount point list handle */
-  SLIST_ENTRY(pd_mountpoint) m_list;
+  PD_SLIST_ENTRY(struct pd_mountpoint) m_list;
 
   /* The inode for the filesystem */
   pd_inode_t* inode;

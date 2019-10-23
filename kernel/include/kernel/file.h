@@ -1,12 +1,20 @@
 #pragma once
 
 #include <kernel/types.h>
-#include <kos/limits.h>
-#include <sys/dirent.h>
-#include <sys/types.h>
+#include <kernel/limits.h>
+#include <kernel/types.h>
 
 struct pd_inode;
 struct pd_file;
+
+struct dirent {
+  long d_ino;
+  long d_off;
+  unsigned short d_reclen;
+  size_t d_namlen;
+  int d_type;
+  char d_name[PATH_MAX];
+};
 
 /**
  * PowerDream File Operations

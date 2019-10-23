@@ -1,15 +1,18 @@
 #pragma once
 
 #include <kernel/file.h>
-#include <kos/limits.h>
-#include <sys/types.h>
+#include <kernel/limits.h>
+#include <kernel/types.h>
+
+#define S_IS(m, n) (((m) & n) == n)
+#define S_ISDIR(m) S_IS((m), 0x1)
 
 /**
  * PowerDream Inode
  */
 typedef struct pd_inode {
   /* The name of the file */
-  const char name[PATH_MAX];
+  const char name[NAME_MAX];
 
   /* The owner's group ID */
   gid_t gid;

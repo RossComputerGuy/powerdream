@@ -1,22 +1,30 @@
 #pragma once
 
-#include <arch/irq.h>
 #include <kernel/file.h>
+#include <kernel/irq.h>
+#include <kernel/limits.h>
+#include <kernel/list.h>
 #include <kernel/signal.h>
-#include <kos/thread.h>
-#include <sys/types.h>
-#include <sys/queue.h>
+#include <kernel/types.h>
 
 struct pd_process;
 
-#define OPEN_MAX 1024
+#define PD_STATE_RUNNING 0
+#define PD_STATE_ZOMBIE 1
+#define PD_STATE_FINISHED 2
 
 /**
  * PowerDream Process
  */
 typedef struct pd_process {
   /* Process list handle */
-  SLIST_ENTRY(pd_process) p_list;
+  PD_SLIST_ENTRY(struct pd_process) p_list;
+
+  /* Process name */
+  const char name[128];
+
+  /* Process current working directory */
+  const char pwd[PATH_MAX];
 
   /* Process ID */
   pid_t id;
@@ -30,17 +38,20 @@ typedef struct pd_process {
   /* Process group ID */
   gid_t gid;
 
+  /* Process state */
+  int state;
+
   /* Process entry pointer */
   void* entry;
 
-  /* The process's thread */
-  kthread_t* thread;
+  /* Process context */
+  pd_irq_context_t context;
 
   /* Function pointers to store the signal handlers */
   void* signal_handlers[SIGNAL_MAX];
 
   /* The context that was saved before a signal */
-  irq_context_t saved_context;
+  pd_irq_context_t saved_context;
 
   /* Files opened by the process */
   pd_file_t files[OPEN_MAX];

@@ -1,6 +1,11 @@
 #pragma once
 
-#include <sys/utsname.h>
+struct utsname {
+  char sysname[128];
+  char nodename[128];
+  char release[128];
+  char machine[128];
+};
 
 /**
   * Get the system name and information

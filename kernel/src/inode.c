@@ -1,6 +1,6 @@
 #include <kernel/error.h>
 #include <kernel/inode.h>
-#include <malloc.h>
+#include <kernel/mmu.h>
 #include <string.h>
 
 static ino_t next_inode = 0;
@@ -22,8 +22,8 @@ int pd_inode_close(pd_inode_t* inode, pd_file_t* file) {
 }
 
 int pd_inode_create(pd_inode_t** inode, const char* name) {
-  if (strlen(name) >= PATH_MAX) return -ENAMETOOLONG;
-  if (((*inode) = malloc(sizeof(pd_inode_t))) == NULL) return -ENOMEM;
+  if (strlen(name) >= NAME_MAX) return -ENAMETOOLONG;
+  if (((*inode) = kmalloc(sizeof(pd_inode_t))) == NULL) return -ENOMEM;
   memset((*inode), 0, sizeof(pd_inode_t));
 
   strcpy((char*)(*inode)->name, (char*)name);

@@ -1,12 +1,12 @@
-#include <arch/irq.h>
 #include <kernel/fs.h>
+#include <kernel/irq.h>
 #include <kernel/process.h>
 #include <kernel/syscall.h>
 #include <string.h>
 
 static void* syscall_table[SYSCALL_MAX];
 
-static void handle_syscall(irq_t source, irq_context_t* context) {
+static void handle_syscall(uint32_t source, pd_irq_context_t* context) {
   int i = context->r[0];
 
   if (syscall_table[i] != 0) {
@@ -30,5 +30,5 @@ void pd_syscalls_init() {
   syscall_table[SYS_umount] = umount;
 
   /* Set the system call handler */
-  irq_set_handler(EXC_IRQ0, handle_syscall);
+  pd_irq_set_handler(PD_EXC_IRQ0, handle_syscall);
 }
