@@ -34,3 +34,11 @@ typedef struct pd_tty {
   * @return A tty if found, NULL if not found
   */
 pd_tty_t* pd_tty_fromname(const char* name);
+
+/**
+  * Register a tty
+  *
+  * @param[in] tty The tty to register
+  * @return A negative errno code on failure or zero on success.
+  */
+int pd_tty_register(pd_tty_t* tty);
