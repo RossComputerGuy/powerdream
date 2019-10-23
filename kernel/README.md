@@ -10,3 +10,4 @@ The PowerDream kernel is a unix-like kernel.
 * Add the rest of multiprocessing
 * Finish the filesystem path resolving
 * Add hostname functions
+* Move the serial console stuff into a kernel module and add console/tty functions

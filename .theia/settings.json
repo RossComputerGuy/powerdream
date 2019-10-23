@@ -9,5 +9,6 @@
          "directory": ""
       }
    ],
-   "cpp.clangdArgs": "-I kernel/include -I kernel/fs/include -I toolchain/kos/include"
+   "cpp.clangdArgs": "-I kernel/include -I kernel/fs/include -I toolchain/kos/include",
+   "editor.tabSize": 2
 }

@@ -266,3 +266,15 @@ int pd_mmu_copyv(pd_mmu_context_t* context1, struct iovec* iov1, int iovcnt1, pd
   }
   return copied;
 }
+
+void pd_mmu_init() {
+  last_urc = 0;
+  map_func = map_virt;
+  mmu_shortcut_ok = 0;
+
+  // TODO: install IRQ handlers
+
+  SET_MMUCR(0x3f, 0, 1, 0, 1, 1);
+
+  pd_mmu_reset_itlb();
+}

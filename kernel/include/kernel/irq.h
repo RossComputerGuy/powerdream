@@ -22,5 +22,28 @@ typedef struct {
 
 #define PD_EXC_IRQ0 0x0200
 
+typedef void (*pd_irq_handler_t)(uint32_t irq, pd_irq_context_t* context);
+
+/**
+  * Gets the current IRQ CPU register context
+  *
+  * @return The current register context
+  */
 pd_irq_context_t* pd_irq_get_context();
-void pd_irq_set_handler(uint32_t irq, void (*handler)(uint32_t irq, pd_irq_context_t* context));
+
+/**
+  * Installs a handler for an IRQ
+  *
+  * @param[in] code The IRQ to install a handler for
+  * @param[in] handler The function to use for handling the IRQ
+  * @return Zero is returned on success or a negative errno code will be returned if it failed
+  */
+int pd_irq_set_handler(uint32_t code, pd_irq_handler_t handler);
+
+/**
+  * Get the IRQ handler for an IRQ
+  *
+  * @param[in] code The IRQ code
+  * @return The IRQ handler for the IRQ, will be NULL if code is invalid or if there's no handler installed
+  */
+pd_irq_handler_t pd_irq_get_handler(uint32_t code);

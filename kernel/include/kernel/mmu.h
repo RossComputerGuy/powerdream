@@ -56,13 +56,79 @@ typedef pd_mmu_page_t* (*pd_mmu_mapfunc_t)(pd_mmu_context_t* context, int virtpa
 
 extern pd_mmu_context_t pd_mmu_ctx_curr;
 
+/**
+  * Switches the current MMU context
+  *
+  * @param[in] context The MMU table context
+  */
 void pd_mmu_use_table(pd_mmu_context_t context);
+
+/**
+  * Creates a new MMU context
+  *
+  * @param[out] context The pointer to store the newly created context
+  * @param[in] asid The address space ID
+  */
 void pd_mmu_context_create(pd_mmu_context_t* context, int asid);
+
+/**
+  * Converts a virtual page address into a physical page address
+  *
+  * @param[out] context The context to use
+  * @param[in] virtpage The virtual page address
+  * @return The physical page address
+  */
 int pd_mmu_virt2phys(pd_mmu_context_t* context, int virtpage);
+
+/**
+  * Switches the context
+  *
+  * @param[out] context The context to switch to
+  */
 void pd_mmu_switch_context(pd_mmu_context_t* context);
+
+/**
+  * Maps a page and sets it up
+  *
+  * @param[out] context The context to use for mapping
+  * @param[in] virtpage The virtual page address
+  * @param[in] physpage The physical page address
+  * @param[in] count The number of pages to map
+  * @param[in] prot The protection to set
+  * @param[in] cache The cache mode to set
+  * @param[in] share Sets whether to share the page or not
+  * @param[in] dirty Sets whether the page is dirty or not
+  */
 void pd_mmu_page_map(pd_mmu_context_t* context, int virtpage, int physpage, int count, int prot, int cache, int share, int dirty);
+
+/**
+  * Copy from a page to a buffer
+  *
+  * @param[out] contex The context to use for copying
+  * @param[in] srcaddr The source address
+  * @param[in] srccnt The count for the source address
+  * @param[in] buffer The destination buffer
+  * @return The amount copied
+  */
 int pd_mmu_copyin(pd_mmu_context_t* context, uint32_t srcaddr, uint32_t srccnt, void* buffer);
+
+/**
+  * Copy from a page in one context to another context
+  *
+  * @param[out] context The source context
+  * @param[in] iov1 The source I/O vector
+  * @param[in] iovcnt1 The source I/O vector count
+  * @param[out] context The destination context
+  * @param[in] iov2 The destination I/O vector
+  * @param[in] iovcnt2 The destination I/O vector count
+  * @return The amount copied
+  */
 int pd_mmu_copyv(pd_mmu_context_t* context1, struct iovec* iov1, int iovcnt1, pd_mmu_context_t* context2, struct iovec* iov2, int iovcnt2);
+
+/**
+  * Initialize the MMU
+  */
+void pd_mmu_init();
 
 /**
  * Allocate memory for the kernel

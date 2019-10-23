@@ -11,3 +11,4 @@
 #define ENODEV 9
 #define ENOENT 10
 #define ENOTDIR 11
+#define EIO 12
