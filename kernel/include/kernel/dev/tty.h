@@ -10,8 +10,8 @@ typedef struct pd_tty {
   const char name[NAME_MAX];
   dev_t dev;
 
-  size_t (*write)(const void* buffer, size_t length);
-  size_t (*read)(void* buffer, size_t length);
+  size_t (*write)(struct pd_tty* tty, const void* buffer, size_t length);
+  size_t (*read)(struct pd_tty* tty, void* buffer, size_t length);
 } pd_tty_t;
 
 /**
