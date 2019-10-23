@@ -167,6 +167,8 @@ int pd_mmu_copyin(pd_mmu_context_t* context, uint32_t srcaddr, uint32_t srccnt, 
 
     copied += run;
   }
+
+  return copied;
 }
 
 int pd_mmu_copyv(pd_mmu_context_t* context1, struct iovec* iov1, int iovcnt1, pd_mmu_context_t* context2, struct iovec* iov2, int iovcnt2) {
@@ -174,7 +176,7 @@ int pd_mmu_copyv(pd_mmu_context_t* context1, struct iovec* iov1, int iovcnt1, pd
   uint32_t srccnt = iov1[srciov].iov_len;
   uint32_t srcptr = (uint32_t)iov1[srciov].iov_base;
 
-  pd_mmu_page_t* srcpage;
+  pd_mmu_page_t* srcpage = NULL;
   uint32_t src = srcptr;
   int srckrn = 1;
   if(!(srcptr & 0x80000000)) {
@@ -183,5 +185,31 @@ int pd_mmu_copyv(pd_mmu_context_t* context1, struct iovec* iov1, int iovcnt1, pd
     src = (srcpage->physical << PD_PAGESIZE_BITS) | (srcptr & PD_PAGEMASK);
     srckrn = 0;
   }
-  return 0;
+
+  int dstiov = 0;
+  uint32_t dstcnt = iov2[dstiov].iov_len;
+  uint32_t dstptr = (uint32_t)iov2[dstiov].iov_base;
+
+  pd_mmu_page_t* dstpage = NULL;
+  uint32_t dst = dstptr;
+  int dstkrn = 1;
+  if (!(dstptr & 0x80000000)) {
+    dstpage = map_virt(context2, dstrptr >> PD_PAGESIZE_BITS);
+    // TODO: if (dstpage == NULL) panic
+    dst = (dstpage->physical << PD_PAGESIZE_BITS) | (dstptr & PD_PAGEMASK);
+    dstkrn = 0;
+  }
+
+  int copied = 0;
+  uint32_t run = 0;
+  while (srciov < iovcnt1 && dstiov < iovcnt2) {
+    run = PD_PAGESIZE - (srcptr & PD_PAGEMASK);
+
+    if ((PD_PAGESIZE - (dstptr & PD_PAGEMASK)) < run) run = PD_PAGESIZE - (dstptr & PD_PAGEMASK);
+    if (srccnt < run) run = srccnt;
+    if (dstcnt < run) run = dstcnt;
+
+    memcpy((void*)(dst | 0xa0000000), (void*)(src | 0x80000000), run);
+  }
+  return copied;
 }
