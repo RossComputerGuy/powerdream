@@ -29,6 +29,7 @@ add_executable(kernel
   "${PROJECT_SOURCE_DIR}/src/fs.c"
   "${PROJECT_SOURCE_DIR}/src/inode.c"
   "${PROJECT_SOURCE_DIR}/src/irq.c"
+  "${PROJECT_SOURCE_DIR}/src/mem.c"
   "${PROJECT_SOURCE_DIR}/src/mmu.c"
   "${PROJECT_SOURCE_DIR}/src/process.c"
   "${PROJECT_SOURCE_DIR}/src/sem.c"

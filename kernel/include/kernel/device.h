@@ -23,11 +23,11 @@ typedef struct pd_dev {
 } pd_dev_t;
 
 /**
-  * Gets a device from the device number
+  * Gets a device from the device name
   *
-  * @param[in] dev The device identification
+  * @param[in] name The device name
   * @return NULL if a device is not found or a device
   */
-pd_dev_t* pd_dev_fromdev(dev_t dev);
+pd_dev_t* pd_dev_fromname(const char* name);
 
 int pd_dev_register(pd_dev_t* device);

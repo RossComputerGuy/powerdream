@@ -18,7 +18,7 @@ static volatile uint32_t* const mmucr = (uint32_t*)(0xff000010);
 #define GET_URC() ((*mmucr >> 10) & 63)
 #define INCR_URC() do { SET_URC(GET_URC() + 1); } while(0)
 
-pd_mmu_context_t pd_mmu_ctx_curr;
+pd_mmu_context_t* pd_mmu_ctx_curr = NULL;
 
 static int mmu_shortcut_ok = 0;
 static pd_mmu_mapfunc_t map_func;
@@ -56,20 +56,22 @@ static pd_mmu_page_t* map_virt(pd_mmu_context_t* context, int virtpage) {
   int top = (virtpage >> PD_MMU_TOP_SHIFT) & PD_MMU_TOP_MASK;
   int bot = (virtpage >> PD_MMU_BOT_SHIFT) & PD_MMU_BOT_SHIFT;
 
-  pd_mmu_subcontext_t* sub = &context->sub[top];
+  pd_mmu_subcontext_t* sub = context->sub[top];
+  if (sub == NULL) return NULL;
   pd_mmu_page_t* page = (pd_mmu_page_t*)(sub + bot);
   if (!page->valid) return NULL;
   return page;
 }
 
-void pd_mmu_use_table(pd_mmu_context_t context) {
-  memcpy(&pd_mmu_ctx_curr, &context, sizeof(pd_mmu_context_t));
+void pd_mmu_use_table(pd_mmu_context_t* context) {
+  pd_mmu_ctx_curr = context;
   mmu_shortcut_ok = (map_func == map_virt);
 }
 
-void pd_mmu_context_create(pd_mmu_context_t* context, int asid) {
+void pd_mmu_context_create(pd_mmu_context_t** context, int asid) {
+  (*context) = pd_basic_alloc(sizeof(pd_mmu_context_t));
   context->asid = asid;
-  for (int i = 0; i < PD_MMU_PAGES; i++) memset(&context->sub[i], 0, sizeof(pd_mmu_subcontext_t));
+  for (int i = 0; i < PD_MMU_PAGES; i++) context->sub[i] = NULL;
 }
 
 int pd_mmu_virt2phys(pd_mmu_context_t* context, int virtpage) {
@@ -88,8 +90,12 @@ static void pd_mmu_page_map_single(pd_mmu_context_t* context, int virtpage, int 
   int top = (virtpage >> PD_MMU_TOP_SHIFT) & PD_MMU_TOP_MASK;
   int bot = (virtpage >> PD_MMU_BOT_SHIFT) & PD_MMU_BOT_SHIFT;
 
-  pd_mmu_subcontext_t* sub = &context->sub[top];
-  for (int i = 0; i < PD_MMU_SUB_PAGES; i++) sub[i]->valid = 0;
+  pd_mmu_subcontext_t* sub = context->sub[top];
+  if (sub == NULL) {
+    sub = pd_basic_alloc(sizeof(pd_mmu_subcontext_t));
+    for (int i = 0; i < PD_MMU_SUB_PAGES; i++) sub[i]->valid = 0;
+    context->sub[top] = sub;
+  }
 
   pd_mmu_page_t* page = (pd_mmu_page_t*)(sub + bot);
 

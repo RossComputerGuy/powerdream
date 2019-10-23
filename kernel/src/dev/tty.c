@@ -1,22 +1,41 @@
 #include <kernel/dev/char.h>
 #include <kernel/dev/tty.h>
+#include <kernel/device.h>
 #include <kernel/error.h>
 
 PD_SLIST_HEAD(ttys, pd_tty_t);
 
 static struct ttys ttys;
 
-pd_tty_t* pd_tty_fromdev(dev_t dev) {
+static size_t tty_read(pd_chardev_t* chardev, pd_file_t* file, off_t offset, char* buffer, size_t length) {
+  return 0;
+}
+
+static size_t tty_write(pd_chardev_t* chardev, pd_file_t* file, off_t offset, const char* buffer, size_t length) {
+  return 0;
+}
+
+pd_tty_t* pd_tty_fromname(const char* name) {
   pd_tty_t* tty = NULL;
   PD_SLIST_FOREACH(tty, &ttys, t_list) {
-    if (tty->dev == dev) return tty;
+    if (!strcmp(tty->name, name)) return tty;
   }
   return NULL;
 }
 
 int pd_tty_register(pd_tty_t* tty) {
-  if (pd_tty_fromdev(tty->dev) != NULL) return -EEXIST;
-  // TODO: register character device
+  if (pd_tty_fromname(tty->name) != NULL) return -EEXIST;
+
+  pd_chardev_t* chardev = kmalloc(sizeof(pd_chardev_t));
+  strcpy(chardev->name, tty->name);
+  chardev->dev = MKNOD(5, 0);
+  chardev->size = 0;
+  chardev->read = tty_read;
+  chardev->write = tty_write;
+
+  int r = pd_chardev_register(chardev);
+  if (r < 0) return r;
+
   PD_SLIST_INSERT_HEAD(&ttys, tty, t_list);
   return 0;
 }

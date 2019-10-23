@@ -13,7 +13,6 @@ typedef struct pd_blkdev {
   PD_SLIST_ENTRY(struct pd_blkdev) b_list;
 
   const char name[NAME_MAX];
-  dev_t dev;
   size_t size;
   size_t blkcnt;
   size_t blksz;
@@ -23,12 +22,12 @@ typedef struct pd_blkdev {
 } pd_blkdev_t;
 
 /**
- * Returns the block device registered for a device
+ * Returns the block device registered for a device name
  *
- * @param[in] dev The device that the blkdev is mapped to
+ * @param[in] name The name of the block device
  * @return A block device or NULL if it cannot be found.
  */
-pd_blkdev_t* pd_blkdev_fromdev(dev_t dev);
+pd_blkdev_t* pd_blkdev_fromname(const char* name);
 
 /**
  * Registeres a block device

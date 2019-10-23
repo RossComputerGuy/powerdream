@@ -1,5 +1,6 @@
 #pragma once
 
+#include <kernel/file.h>
 #include <kernel/limits.h>
 #include <kernel/list.h>
 #include <kernel/types.h>
@@ -12,17 +13,17 @@ typedef struct pd_chardev {
 
   size_t size;
 
-  size_t (*read)(struct pd_chardev* chardev, off_t offset, char* buffer, size_t length);
-  size_t (*write)(struct pd_chardev* chardev, off_t offset, const char* buffer, size_t length);
+  size_t (*read)(struct pd_chardev* chardev, pd_file_t* file, off_t offset, char* buffer, size_t length);
+  size_t (*write)(struct pd_chardev* chardev,  pd_file_t* file, off_t offset, const char* buffer, size_t length);
 } pd_chardev_t;
 
 /**
-  * Gets a character device from a device
+  * Gets a character device from a device name
   *
-  * @param[in] dev The device
+  * @param[in] name The name of the device
   * @return A character device or NULL if it cannot be found
   */
-pd_chardev_t* pd_chardev_fromdev(dev_t dev);
+pd_chardev_t* pd_chardev_fromname(const char* name);
 
 /**
   * Registers a character device

@@ -4,20 +4,33 @@
 #include <kernel/list.h>
 #include <kernel/types.h>
 
+#define PD_TTY_HASBAUD (1 << 0)
+
+struct termios {
+	uint8_t iflag;
+	uint8_t oflag;
+	uint8_t cflag;
+	uint8_t lflag;
+	unsigned char line;
+	unsigned char cc[19];
+};
+
 typedef struct pd_tty {
   PD_SLIST_ENTRY(struct pd_tty) t_list;
 
+  uint8_t flags;
+  uint16_t baud;
+
   const char name[NAME_MAX];
-  dev_t dev;
 
   size_t (*write)(struct pd_tty* tty, const void* buffer, size_t length);
   size_t (*read)(struct pd_tty* tty, void* buffer, size_t length);
 } pd_tty_t;
 
 /**
-  * Gets a tty from a device
+  * Gets a tty from its name
   *
-  * @param[in] dev The device to use
+  * @param[in] name The tty name
   * @return A tty if found, NULL if not found
   */
-pd_tty_t* pd_tty_fromdev(dev_t dev);
+pd_tty_t* pd_tty_fromname(const char* name);
