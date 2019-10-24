@@ -1,5 +1,7 @@
 #include <kernel/dev/char.h>
+#include <kernel/device.h>
 #include <kernel/error.h>
+#include <malloc.h>
 #include <string.h>
 
 PD_SLIST_HEAD(chardevs, pd_chardev_t);
@@ -40,7 +42,17 @@ pd_chardev_t* pd_chardev_fromname(const char* name) {
 
 int pd_chardev_register(pd_chardev_t* chardev) {
   if (pd_chardev_fromname(chardev->name) == NULL) return -EEXIST;
-  // TODO: register with kernel device API
+  
+  pd_dev_t* dev = malloc(sizeof(pd_dev_t));
+  strcpy((char*)dev->name, chardev->name);
+  dev->dev = chardev->dev;
+  dev->opts.read = chardev_read;
+  dev->opts.write = chardev_write;
+
   PD_SLIST_INSERT_HEAD(&chardevs, chardev, c_list);
   return 0;
+}
+
+void pd_chardev_init() {
+  PD_SLIST_INIT(&chardevs);
 }

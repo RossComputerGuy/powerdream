@@ -32,3 +32,8 @@ pd_chardev_t* pd_chardev_fromname(const char* name);
   * @return Zero on success or a negative errno on failure
   */
 int pd_chardev_register(pd_chardev_t* chardev);
+
+/**
+ * Initialize character devices
+ */
+void pd_chardev_init();

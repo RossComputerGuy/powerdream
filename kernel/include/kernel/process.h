@@ -1,18 +1,24 @@
 #pragma once
 
+#include <arch/irq.h>
+#include <arch/mmu.h>
 #include <kernel/file.h>
-#include <kernel/irq.h>
 #include <kernel/limits.h>
 #include <kernel/list.h>
-#include <kernel/mmu.h>
 #include <kernel/signal.h>
 #include <kernel/types.h>
+#include <sys/reent.h>
+#include <sys/queue.h>
 
 struct pd_process;
 
-#define PD_STATE_RUNNING 0
-#define PD_STATE_ZOMBIE 1
-#define PD_STATE_FINISHED 2
+#define PD_PROC_READY 0
+#define PD_PROC_ZOMBIE 1
+#define PD_PROC_RUNNING 2
+#define PD_PROC_WAIT 3
+#define PD_PROC_FINISHED 4
+
+#define PD_PROC_QUEUED (1 << 0)
 
 /**
  * PowerDream Process
@@ -21,11 +27,26 @@ typedef struct pd_process {
   /* Process list handle */
   PD_SLIST_ENTRY(struct pd_process) p_list;
 
+  /* Process queue handle */
+  TAILQ_ENTRY(pd_process) procq;
+
+  /* Process timer queue handle */
+  TAILQ_ENTRY(pd_process) timerq;
+
   /* Process name */
   const char name[128];
 
   /* Process current working directory */
   const char pwd[PATH_MAX];
+
+  /* Process flags */
+  uint8_t flags;
+
+  /* Process priority */
+  uint32_t priority;
+
+  /* The process exist status */
+  int exitstat;
 
   /* Process ID */
   pid_t id;
@@ -42,20 +63,26 @@ typedef struct pd_process {
   /* Process state */
   int state;
 
-  /* Process entry pointer */
-  void* entry;
+  /* Process stack pointer */
+  void* stack;
+
+  /* Process stack size */
+  uint32_t stack_size;
+
+  /* Newlib reentry */
+  struct _reent reent;
 
   /* Process MMU context */
-  pd_mmu_context_t* mem; // NOTE: we may use heaps for this
+  mmucontext_t* mem;
 
   /* Process context */
-  pd_irq_context_t context;
+  irq_context_t context;
 
   /* Function pointers to store the signal handlers */
   void* signal_handlers[SIGNAL_MAX];
 
   /* The context that was saved before a signal */
-  pd_irq_context_t saved_context;
+  irq_context_t saved_context;
 
   /* Files opened by the process */
   pd_file_t files[OPEN_MAX];
@@ -69,7 +96,15 @@ typedef struct pd_process {
  * @param[in] param The argument to use for the entry function.
  * @return Negative errno number on error, pid on success.
  */
-pid_t pd_process_create(pd_process_t** proc, void* (entry)(void* param), void* param);
+pid_t pd_process_create(pd_process_t** proc, int (*entry)(int argc, char** argv), int argc, char** argv);
+
+/**
+ * Have the process exit
+ *
+ * @param[out] proc The process to exit
+ * @param[in] status The exit status
+ */
+void pd_process_exit(pd_process_t** proc, int status);
 
 /**
  * Destroys a process and sets the pointer to NULL.
@@ -150,6 +185,29 @@ int _signal(int sig, void (*func)(int));
  * @return 0 on success, negative errno on error.
  */
 int kill(pid_t pid, int sig);
+
+/**
+ * Adds a process to the run queue
+ *
+ * @param[in] proc The process to add to the queue
+ * @param[in] fol Set to 1 to add the process to the front of the line
+ */
+void pd_process_addrunnable(pd_process_t* proc, int fol);
+
+/**
+ * Removes a process from the run queue
+ *
+ * @param[in] proc The process to remove from the queue
+ */
+void pd_proces_removerunnable(pd_process_t* proc);
+
+/**
+ * Schedules for the next process to run
+ *
+ * @param[in] fol Set to 1 to add the process to the front of the line
+ * @param[in] now The current timer value
+ */
+void pd_process_schedule(int fol, uint64_t now);
 
 /**
  * Initialize multiprocessing

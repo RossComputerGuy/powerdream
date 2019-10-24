@@ -37,3 +37,8 @@ pd_dev_t* pd_dev_fromname(const char* name);
  * @return Zero or a negative errno code
  */
 int pd_dev_register(pd_dev_t* device);
+
+/**
+ * Initialize the device system
+ */
+void pd_dev_init();

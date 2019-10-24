@@ -19,3 +19,7 @@ int pd_dev_register(pd_dev_t* device) {
   PD_SLIST_INSERT_HEAD(&devices, device, d_list);
   return 0;
 }
+
+void pd_dev_init() {
+  PD_SLIST_INIT(&devices);
+}

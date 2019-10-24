@@ -51,3 +51,8 @@ pd_tty_t* pd_tty_fromname(const char* name);
   * @return A negative errno code on failure or zero on success.
   */
 int pd_tty_register(pd_tty_t* tty);
+
+/**
+ * Initialize the ttys
+ */
+void pd_tty_init();

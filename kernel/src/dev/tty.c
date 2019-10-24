@@ -2,7 +2,7 @@
 #include <kernel/dev/tty.h>
 #include <kernel/device.h>
 #include <kernel/error.h>
-#include <kernel/mem.h>
+#include <malloc.h>
 #include <string.h>
 
 PD_SLIST_HEAD(ttys, pd_tty_t);
@@ -28,7 +28,7 @@ pd_tty_t* pd_tty_fromname(const char* name) {
 int pd_tty_register(pd_tty_t* tty) {
   if (pd_tty_fromname(tty->name) != NULL) return -EEXIST;
 
-  pd_chardev_t* chardev = kmalloc(sizeof(pd_chardev_t));
+  pd_chardev_t* chardev = malloc(sizeof(pd_chardev_t));
   strcpy((char*)chardev->name, tty->name);
   chardev->dev = MKDEV(5, 0);
   chardev->size = 0;
@@ -40,4 +40,8 @@ int pd_tty_register(pd_tty_t* tty) {
 
   PD_SLIST_INSERT_HEAD(&ttys, tty, t_list);
   return 0;
+}
+
+void pd_tty_init() {
+  PD_SLIST_INIT(&ttys);
 }

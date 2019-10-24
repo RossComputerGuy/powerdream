@@ -1,6 +1,6 @@
 #include <kernel/error.h>
 #include <kernel/fs.h>
-#include <kernel/mem.h>
+#include <malloc.h>
 #include <kernel/process.h>
 #include <string.h>
 
@@ -59,7 +59,7 @@ int pd_fs_mount(pd_fs_t* fs, pd_blkdev_t* dev, const char* source, const char* t
   if (source != NULL && pd_mountpoint_fromsrc(source) != NULL) return -EACCES;
   if (pd_mountpoint_fromtarget(target) != NULL) return -EACCES;
 
-  pd_mountpoint_t* mp = kmalloc(sizeof(pd_mountpoint_t));
+  pd_mountpoint_t* mp = malloc(sizeof(pd_mountpoint_t));
   if (mp == NULL) return -ENOMEM;
   memset(mp, 0, sizeof(pd_mountpoint_t));
 
@@ -72,7 +72,7 @@ int pd_fs_mount(pd_fs_t* fs, pd_blkdev_t* dev, const char* source, const char* t
 
   int r = fs->mount(&mp->inode, dev, source, target, flags, data);
   if (r < 0) {
-    kfree(mp);
+    free(mp);
     return r;
   }
 
@@ -88,7 +88,7 @@ int pd_fs_umount(pd_fs_t* fs, const char* target) {
   if (r < 0) return r;
 
   PD_SLIST_REMOVE(&mountpoints, mp, pd_mountpoint_t, m_list);
-  kfree(mp);
+  free(mp);
   return 0;
 }
 
