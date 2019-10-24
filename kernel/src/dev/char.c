@@ -48,6 +48,14 @@ static size_t chardev_write(pd_inode_t* inode, pd_file_t* file, const char* buff
   return w;
 }
 
+static int chardev_ioctl(pd_inode_t* inode, pd_file_t* file, unsigned int request, unsigned long argsize, void** arg) {
+  pd_chardev_t* chardev = pd_chardev_fromname(inode->name);
+  if (chardev == NULL) chardev = inode->impl;
+  if (chardev == NULL) return -ENODEV;
+  if (chardev->ioctl == NULL) return -EIO;
+  return chardev->ioctl(chardev, file, request, argsize, arg);
+}
+
 int pd_chardev_fromindex() {
   return chardev_count;
 }
@@ -78,6 +86,7 @@ int pd_chardev_register(pd_chardev_t* chardev) {
   dev->dev = chardev->dev;
   dev->opts.read = chardev_read;
   dev->opts.write = chardev_write;
+  dev->opts.ioctl = chardev_ioctl;
 
   int r = pd_dev_register(dev);
   if (r < 0) {

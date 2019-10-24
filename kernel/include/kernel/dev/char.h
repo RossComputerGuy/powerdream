@@ -14,7 +14,8 @@ typedef struct pd_chardev {
   size_t size;
 
   size_t (*read)(struct pd_chardev* chardev, pd_file_t* file, off_t offset, char* buffer, size_t length);
-  size_t (*write)(struct pd_chardev* chardev,  pd_file_t* file, off_t offset, const char* buffer, size_t length);
+  size_t (*write)(struct pd_chardev* chardev, pd_file_t* file, off_t offset, const char* buffer, size_t length);
+  int (*ioctl)(struct pd_chardev* chardev, pd_file_t* file, unsigned int request, unsigned long argsize, void** arg);
 } pd_chardev_t;
 
 /**
