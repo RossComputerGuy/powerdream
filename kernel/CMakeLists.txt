@@ -5,8 +5,19 @@ set(CMAKE_TOOLCHAIN_FILE toolchain.cmake)
 project(pd-kernel C ASM)
 set(PROJECT_VERSION "0.1.0")
 
-set(SERIAL_BAUD 57600)
-set(SERIAL_FIFO 1)
+option(COMPILED_CMDLINE "Compile the kernel command line options into the binary instead of loading from a file" OFF)
+
+if (NOT SERIAL_BAUD)
+  set(SERIAL_BAUD 57600)
+endif()
+if (NOT SERIAL_FIFO)
+  set(SERIAL_FIFO 1)
+endif()
+if (COMPILED_CMDLINE)
+  if (NOT CMDLINE)
+    set(CMDLINE "")
+  endif()
+endif()
 
 set(CMAKE_USER "$ENV{USER}")
 configure_file("${PROJECT_SOURCE_DIR}/data/config.h.in" "${PROJECT_BINARY_DIR}/kernel-config.h")
@@ -24,8 +35,9 @@ add_executable(kernel
   "${PROJECT_SOURCE_DIR}/src/device.c"
   "${PROJECT_SOURCE_DIR}/src/fs.c"
   "${PROJECT_SOURCE_DIR}/src/inode.c"
+  "${PROJECT_SOURCE_DIR}/src/module.c"
   "${PROJECT_SOURCE_DIR}/src/process.c"
   "${PROJECT_SOURCE_DIR}/src/syscall.c"
   "${PROJECT_SOURCE_DIR}/src/system.c")
-#add_dependencies(kernel kernel-fs)
-#target_link_libraries(kernel kernel-fs)
+add_dependencies(kernel kernel-fs)
+target_link_libraries(kernel kernel-fs)

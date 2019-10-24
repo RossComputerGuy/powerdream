@@ -5,7 +5,9 @@
 #include <kernel/list.h>
 #include <kernel/types.h>
 
-#define MKDEV(a, b) ((a << 8) | (b))
+#define PD_DEV_MAJOR(dev) (dev >> 8)
+#define PD_DEV_MINOR(dev) (dev & 0xFF)
+#define MKDEV(major, minor) ((major << 8) | (minor))
 
 #define PD_BLK_MINOR 1
 #define PD_CHAR_MINOR 2

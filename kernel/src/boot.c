@@ -1,8 +1,10 @@
+#include <arch/panic.h>
 #include <kernel/dev/block.h>
 #include <kernel/dev/char.h>
 #include <kernel/dev/tty.h>
 #include <kernel/device.h>
 #include <kernel/fs.h>
+#include <kernel/module.h>
 #include <kernel/process.h>
 #include <kernel/syscall.h>
 #include <kernel-config.h>
@@ -21,8 +23,12 @@ int main(int argc, char** argv) {
 
   printf("Bootstrap completed, 2nd stage of kernel boot process starting\n");
 
+  int r = pd_kmods_init();
+  if (r < 0) arch_panic("Failed to load kernel modules");
+
+  printf("%d kernel modules loaded\n", pd_getmodcount());
+
   // TODO: read boot parameters
-  // TODO: start loading kernel modules
   // TODO: load ramdisk
   // TODO: start init program as PID 1
   while (1);

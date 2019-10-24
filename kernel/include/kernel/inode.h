@@ -4,8 +4,16 @@
 #include <kernel/limits.h>
 #include <kernel/types.h>
 
-#define S_IS(m, n) (((m) & n) == n)
-#define S_ISDIR(m) S_IS((m), 0x1)
+#define PD_NODE_FILE (1 << 0)
+#define PD_NODE_DIR (2 << 0)
+#define PD_NODE_CHR (3 << 0)
+#define PD_NODE_BLK (4 << 0)
+#define PD_NODE_FIFO (5 << 0)
+#define PD_NODE_LNK (6 << 0)
+#define PD_NODE_SOCK (7 << 0)
+
+#define S_IS(m, n) (((m) & PD_NODE_##n) == PD_NODE_##n)
+#define S_ISDIR(m) S_IS((m), DIR)
 
 /**
  * PowerDream Inode
@@ -25,10 +33,10 @@ typedef struct pd_inode {
 
   /* The size of the contents in bytes */
   size_t size;
-  
+
   /* Inode mode */
   mode_t mode;
-  
+
   /* Hard link count */
   nlink_t nlink;
 
@@ -37,7 +45,7 @@ typedef struct pd_inode {
 
   /* Device for the inode */
   dev_t dev;
-  
+
   /* Block size */
   blksize_t blksize;
 
@@ -48,8 +56,8 @@ typedef struct pd_inode {
   time_t atime;
 
   /* Modify time */
-
   time_t mtime;
+
   /* Create time */
   time_t ctime;
 

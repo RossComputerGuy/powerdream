@@ -120,6 +120,14 @@ int pd_resolve_path(pd_inode_t** inode, const char* path);
 int pd_fs_register(pd_fs_t* fs);
 
 /**
+ * Unregisters a filesystem
+ *
+ * @param[in] fs The filesystem to unregister.
+ * @return 0 on success or a negative errno code on failure.
+ */
+int pd_fs_unregister(pd_fs_t* fs);
+
+/**
  * Mount a filesystem
  *
  * @param[in] fs The filesystem to mount

@@ -8,6 +8,7 @@
 PD_SLIST_HEAD(ttys, pd_tty_t);
 
 static struct ttys ttys;
+static size_t tty_count = 0;
 
 static size_t tty_read(pd_chardev_t* chardev, pd_file_t* file, off_t offset, char* buffer, size_t length) {
   return 0;
@@ -30,18 +31,23 @@ int pd_tty_register(pd_tty_t* tty) {
 
   pd_chardev_t* chardev = malloc(sizeof(pd_chardev_t));
   strcpy((char*)chardev->name, tty->name);
-  chardev->dev = MKDEV(5, 0);
+  chardev->dev = MKDEV(2, tty_count);
   chardev->size = 0;
   chardev->read = tty_read;
   chardev->write = tty_write;
 
   int r = pd_chardev_register(chardev);
-  if (r < 0) return r;
+  if (r < 0) {
+    free(chardev);
+    return r;
+  }
 
+  tty_count++;
   PD_SLIST_INSERT_HEAD(&ttys, tty, t_list);
   return 0;
 }
 
 void pd_tty_init() {
+  tty_count = 0;
   PD_SLIST_INIT(&ttys);
 }

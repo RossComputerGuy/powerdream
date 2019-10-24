@@ -18,6 +18,21 @@ typedef struct pd_chardev {
 } pd_chardev_t;
 
 /**
+  * Get the number of registered character devices
+  *
+  * @return The number of registered character devices
+  */
+int pd_chardev_getcount();
+
+/**
+  * Gets a character device from its index
+  *
+  * @param[in] i The index of the device
+  * @return A character device or NULL if it cannot be found
+  */
+pd_chardev_t* pd_chardev_fromindex(size_t i);
+
+/**
   * Gets a character device from a device name
   *
   * @param[in] name The name of the device

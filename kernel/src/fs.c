@@ -45,12 +45,25 @@ pd_mountpoint_t* pd_mountpoint_fromsrc(const char* source) {
 int pd_resolve_path(pd_inode_t** inode, const char* path) {
   pd_mountpoint_t* rootmp = pd_mountpoint_fromtarget("/");
   if (rootmp == NULL) return -ENOENT;
+  pd_mountpoint_t* mp = NULL;
+  PD_SLIST_FOREACH(mp, &mountpoints, m_list) {
+    if (!strncmp(mp->target, path, strlen(mp->target))) {
+      rootmp = mp;
+      break;
+    }
+  }
   return pd_inode_resolve_path(rootmp->inode, inode, path);
 }
 
 int pd_fs_register(pd_fs_t* fs) {
   if (pd_fs_fromname(fs->name) != NULL) return -EEXIST;
   PD_SLIST_INSERT_HEAD(&filesystems, fs, f_list);
+  return 0;
+}
+
+int pd_fs_unregister(pd_fs_t* fs) {
+  if (pd_fs_fromname(fs->name) == NULL) return -ENOENT;
+  PD_SLIT_REMOVE(&filesystems, fs, pd_fs_t, f_list);
   return 0;
 }
 
@@ -112,7 +125,7 @@ int umount(const char* target) {
 
   pd_mountpoint_t* mp = pd_mountpoint_fromtarget(target);
   if (mp == NULL) return -EINVAL;
-  
+
   pd_fs_t* fs = pd_fs_fromname(mp->fs);
   if (fs == NULL) return -ENODEV;
 
