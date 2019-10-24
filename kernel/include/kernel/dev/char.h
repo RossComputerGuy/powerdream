@@ -51,4 +51,4 @@ int pd_chardev_register(pd_chardev_t* chardev);
 /**
  * Initialize character devices
  */
-void pd_chardev_init();
+int pd_chardev_init();

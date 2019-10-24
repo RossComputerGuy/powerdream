@@ -62,7 +62,7 @@ int pd_blkdev_register(pd_blkdev_t* blkdev) {
   pd_dev_t* dev = malloc(sizeof(pd_dev_t));
   if (dev == NULL) return -ENOMEM;
   strcpy((char*)dev->name, blkdev->name);
-  dev->dev = MKDEV(1, blkdev_count);
+  dev->dev = MKDEV(0, blkdev_count);
   dev->opts.read = blkdev_read;
   dev->opts.write = blkdev_write;
 

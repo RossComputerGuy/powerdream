@@ -27,6 +27,7 @@ include_directories("${PROJECT_SOURCE_DIR}/include")
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/fs")
 add_compile_options("-Werror=implicit-function-declaration")
+add_link_options("-T${PROJECT_SOURCE_DIR}/data/kernel.ld")
 add_executable(kernel
   "${PROJECT_SOURCE_DIR}/src/dev/block.c"
   "${PROJECT_SOURCE_DIR}/src/dev/char.c"

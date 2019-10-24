@@ -4,6 +4,9 @@
 #include <malloc.h>
 #include <string.h>
 
+#define DEV_NULL MKDEV(1, 0)
+#define DEV_RANDOM MKDEV(1, 1)
+
 PD_SLIST_HEAD(chardevs, pd_chardev_t);
 
 static struct chardevs chardevs;
@@ -13,6 +16,14 @@ static size_t chardev_read(pd_inode_t* inode, pd_file_t* file, char* buff, size_
   pd_chardev_t* chardev = pd_chardev_fromname(inode->name);
   if (chardev == NULL) chardev = inode->impl;
   if (chardev == NULL) return -ENODEV;
+  if (chardev->dev == DEV_NULL) {
+    memcpy(buff, 0, size);
+    return w;
+  }
+  if (chardev->dev == DEV_RANDOM) {
+    for (size_t i = 0; i < size; i++) buff[i] = rand();
+    return w;
+  }
   if (chardev->read == NULL) return -EIO;
 
   size_t r = chardev->read(chardev, file, file->offset, buff, size);
@@ -26,7 +37,9 @@ static size_t chardev_write(pd_inode_t* inode, pd_file_t* file, const char* buff
   pd_chardev_t* chardev = pd_chardev_fromname(inode->name);
   if (chardev == NULL) chardev = inode->impl;
   if (chardev == NULL) return -ENODEV;
-  if (chardev->read == NULL) return -EIO;
+  if (chardev->dev == DEV_NULL) return w;
+  if (chardev->dev == DEV_RANDOM) return -EPERM;
+  if (chardev->write == NULL) return -EIO;
 
   size_t w = chardev->write(chardev, file, file->offset, buff, size);
   if (w < 0) return w;
@@ -77,7 +90,27 @@ int pd_chardev_register(pd_chardev_t* chardev) {
   return 0;
 }
 
-void pd_chardev_init() {
+#define DEF_CHARDEV(name, dev) { \
+  pd_chardev_t* chardev = malloc(sizeof(pd_chardev_t)); \
+  if (chardev == NULL) return -ENOMEM; \
+  strcpy((char*)chardev->name, name); \
+  chardev->dev = dev; \
+
+  int r = pd_chardev_register(chardev); \
+  if (r < 0) { \
+    free(chardev); \
+    return r; \
+  } \
+}
+
+int pd_chardev_init() {
   chardev_count = 0;
   PD_SLIST_INIT(&chardevs);
+
+  /* null character device */
+  DEF_CHARDEV("null", DEV_NULL)
+
+  /* random character device */
+  DEF_CHARDEV("random", DEV_RANDOM)
+  return 0;
 }
