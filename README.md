@@ -5,5 +5,4 @@ Unix-like modular operating system for the Sega Dreamcast. The goal of this proj
 ## TODO
 * Move away from using KallistiOS as this can give us more power and control
 * Ramdisk building
-* Kernel modules
 * Kernel filesystems

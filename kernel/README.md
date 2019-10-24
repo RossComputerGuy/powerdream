@@ -1,12 +1,10 @@
 # PowerDream Kernel
 
-The PowerDream kernel is a unix-like kernel.
+The PowerDream kernel is a unix-like modular kernel for the Sega Dreamcast. It has support for multiple users, preepemtive multitasking, block and character devices, multiple TTY's.
 
 ## TODO
-* Add panic function
-* Add kernel modules
-* Add the rest of multiprocessing
-* Finish the filesystem path resolving
 * Add hostname functions
-* Move the serial console stuff into a kernel module and add console/tty functions
-* Implement heaps like from [this](http://www.jamesmolloy.co.uk/tutorial_html/7.-The%20Heap.html)
+* Add more filesystems
+* Add networking
+* Add users and logging in
+* Complete posix support
