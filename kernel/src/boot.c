@@ -2,6 +2,7 @@
 #include <kernel/dev/block.h>
 #include <kernel/dev/char.h>
 #include <kernel/dev/tty.h>
+#include <kernel/fs/devfs.h>
 #include <kernel/device.h>
 #include <kernel/fs.h>
 #include <kernel/klog.h>
@@ -28,6 +29,12 @@ int main(int argc, char** argv) {
   pd_fs_init();
   pd_process_init();
   pd_syscalls_init();
+
+  r = pd_devfs_init();
+  if (r < 0) {
+    printf("Failed to initialize device filesystem: %d", -r);
+    return 0;
+  }
 
   printk("Bootstrap completed, 2nd stage of kernel boot process starting", 0);
 

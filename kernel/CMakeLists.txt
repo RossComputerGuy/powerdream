@@ -24,7 +24,7 @@ configure_file("${PROJECT_SOURCE_DIR}/data/config.h.in" "${PROJECT_BINARY_DIR}/k
 include_directories("${PROJECT_BINARY_DIR}")
 include_directories("${PROJECT_SOURCE_DIR}/include")
 
-set(FILESYSTEMS "${PROJECT_SOURCE_DIR}/fs/devfs.c")
+set(FILESYSTEMS)
 
 add_compile_options("-Werror=implicit-function-declaration")
 add_executable(kernel
@@ -32,6 +32,7 @@ add_executable(kernel
   "${PROJECT_SOURCE_DIR}/src/dev/block.c"
   "${PROJECT_SOURCE_DIR}/src/dev/char.c"
   "${PROJECT_SOURCE_DIR}/src/dev/tty.c"
+  "${PROJECT_SOURCE_DIR}/src/fs/devfs.c"
   "${PROJECT_SOURCE_DIR}/src/boot.c"
   "${PROJECT_SOURCE_DIR}/src/device.c"
   "${PROJECT_SOURCE_DIR}/src/fs.c"

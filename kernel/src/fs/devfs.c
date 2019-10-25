@@ -4,7 +4,6 @@
 #include <kernel/device.h>
 #include <kernel/error.h>
 #include <kernel/fs.h>
-#include <kernel/module.h>
 #include <malloc.h>
 #include <stdio.h>
 
@@ -127,7 +126,7 @@ static int devfs_umount(pd_inode_t* inode) {
   return 0;
 }
 
-static int devfs_init() {
+int pd_devfs_init() {
   if ((devfs = malloc(sizeof(pd_fs_t))) == NULL) return -ENOMEM;
   memset(devfs, 0, sizeof(pd_fs_t));
   devfs->name = "devfs";
@@ -147,12 +146,3 @@ static int devfs_init() {
   }
   return 0;
 }
-
-static void devfs_fini() {
-  pd_fs_unregister(devfs);
-  if (devfs_blocks != NULL) free(devfs_blocks);
-  if (devfs_chars != NULL) free(devfs_chars);
-  free(devfs);
-}
-
-PD_MODDEF(devfs, "devfs", "Tristan Ross", "GPL-3.0", "v0.1.0");
