@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
     } else {
       memset(cmdline, 0, fs_total(cmdline_fd));
       fs_read(cmdline_fd, cmdline, fs_total(cmdline_fd));
-      pd_setcmdline(cmdline);
+      pd_setcmdline((char*)cmdline);
       fs_close(cmdline_fd);
     }
   } else printk("Command line arguments file not found on the CD-ROM, VMU, and ramdisk", 0);

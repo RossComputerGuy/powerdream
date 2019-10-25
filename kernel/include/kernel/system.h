@@ -11,7 +11,7 @@
   *
   * @param[in] str The string to set as the command line arguments
   */
-void pd_setcmdline(char* str);
+void pd_setcmdline(const char* str);
 
 /**
   * Checks if the cmdline has a specific argument
