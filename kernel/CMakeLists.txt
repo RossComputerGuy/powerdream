@@ -33,6 +33,7 @@ add_executable(kernel
   "${PROJECT_SOURCE_DIR}/src/dev/char.c"
   "${PROJECT_SOURCE_DIR}/src/dev/tty.c"
   "${PROJECT_SOURCE_DIR}/src/fs/devfs.c"
+  "${PROJECT_SOURCE_DIR}/src/fs/procfs.c"
   "${PROJECT_SOURCE_DIR}/src/boot.c"
   "${PROJECT_SOURCE_DIR}/src/device.c"
   "${PROJECT_SOURCE_DIR}/src/fs.c"

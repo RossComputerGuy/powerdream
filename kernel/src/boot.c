@@ -3,6 +3,7 @@
 #include <kernel/dev/char.h>
 #include <kernel/dev/tty.h>
 #include <kernel/fs/devfs.h>
+#include <kernel/fs/procfs.h>
 #include <kernel/device.h>
 #include <kernel/fs.h>
 #include <kernel/klog.h>
@@ -32,7 +33,13 @@ int main(int argc, char** argv) {
 
   r = pd_devfs_init();
   if (r < 0) {
-    printf("Failed to initialize device filesystem: %d", -r);
+    printk("Failed to initialize device filesystem: %d", -r);
+    return 0;
+  }
+
+  r = pd_procfs_init();
+  if (r < 0) {
+    printk("Failed to initialize process filesystem: %d", -r);
     return 0;
   }
 
