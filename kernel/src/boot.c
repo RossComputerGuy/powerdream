@@ -56,11 +56,11 @@ int main(int argc, char** argv) {
   fs_iso9660_init();
   fs_vmu_init();
   file_t cmdline_fd = fs_open("/cd/cmdline.txt", O_RDONLY);
-  if (!cmdline_fd || fs_total(cmdline_fd) == -1) cmdline_fd = fs_open("/rd/cmdline", O_RDONLY);
-  if (!cmdline_fd || fs_total(cmdline_fd) == -1) cmdline_fd = fs_open("/rd/boot/cmdline", O_RDONLY);
-  if (!cmdline_fd || fs_total(cmdline_fd) == -1) cmdline_fd = fs_open("/vmu/a1/cmdline", O_RDONLY);
-  if (!cmdline_fd || fs_total(cmdline_fd) == -1) cmdline_fd = fs_open("/vmu/a1/boot/cmdline", O_RDONLY);
-  if (cmdline_fd && fs_total(cmdline_fd) > 0) {
+  if (cmdline_fd == FILEHND_INVALID) cmdline_fd = fs_open("/rd/cmdline", O_RDONLY);
+  if (cmdline_fd == FILEHND_INVALID) cmdline_fd = fs_open("/rd/boot/cmdline", O_RDONLY);
+  if (cmdline_fd == FILEHND_INVALID) cmdline_fd = fs_open("/vmu/a1/cmdline", O_RDONLY);
+  if (cmdline_fd == FILEHND_INVALID) cmdline_fd = fs_open("/vmu/a1/boot/cmdline", O_RDONLY);
+  if (cmdline_fd != FILEHND_INVALID) {
     char* cmdline = malloc(fs_total(cmdline_fd));
     if (cmdline == NULL) {
       printk("Failed to allocate RAM for the command line: %d bytes needed", fs_total(cmdline_fd));
