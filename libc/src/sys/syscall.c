@@ -12,6 +12,6 @@ int syscall(int s, uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg3, u
   register long r8 asm ("r8") = arg7;
   register long r9 asm ("r9") = arg8;
   register long r10 asm ("r10") = arg9;
-  asm volatile ("trapa #0" :: "r" (0x200));
+  asm volatile ("trapa #0" :: "r" (32));
   return r0;
 }
