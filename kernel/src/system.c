@@ -3,6 +3,7 @@
 #include <kernel/limits.h>
 #include <kernel/system.h>
 #include <kernel-config.h>
+#include <malloc.h>
 #include <string.h>
 
 static char* cmdline
