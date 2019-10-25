@@ -8,8 +8,23 @@
 PD_SLIST_HEAD(filesystems, pd_fs_t);
 PD_SLIST_HEAD(mountpoint, pd_mountpoint_t);
 
+static size_t fs_count = 0;
 static struct filesystems filesystems;
 static struct mountpoint mountpoints;
+
+size_t pd_fs_getcount() {
+  return fs_count;
+}
+
+pd_fs_t* pd_fs_fromindex(size_t i) {
+  pd_fs_t* fs = NULL;
+  size_t index = 0;
+  PD_SLIST_FOREACH(fs, &filesystems, f_list) {
+    if (index == i) return fs;
+    index++;
+  }
+  return NULL;
+}
 
 pd_fs_t* pd_fs_fromname(const char* name) {
   pd_fs_t* fs;
@@ -61,6 +76,7 @@ int pd_resolve_path(pd_inode_t** inode, const char* path) {
 int pd_fs_register(pd_fs_t* fs) {
   if (pd_fs_fromname(fs->name) != NULL) return -EEXIST;
   printk("Registering filesystem: %s", fs->name);
+  fs_count++;
   PD_SLIST_INSERT_HEAD(&filesystems, fs, f_list);
   return 0;
 }
@@ -137,6 +153,7 @@ int umount(const char* target) {
 }
 
 void pd_fs_init() {
+  fs_count = 0;
   PD_SLIST_INIT(&filesystems);
   PD_SLIST_INIT(&mountpoints);
 }

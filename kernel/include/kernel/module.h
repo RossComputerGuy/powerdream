@@ -17,7 +17,9 @@ typedef struct {
   pd_modfini_t fini;
 } pd_modinfo_t;
 
-#define PD_MODDEF(id, name, author, license, version) pd_modinfo_t kmod_##id = { name, author, license, version, .init = id ##_init, .fini = id ## _fini }; \
+#define PD_MODINIT(id) int kmod_ ## id ## _init()
+#define PD_MODFINI(id) void kmod_ ## id ## _fini()
+#define PD_MODDEF(id, name, author, license, version) pd_modinfo_t kmod_##id = { name, author, license, version, .init = kmod_ ## id ## _init, .fini = kmod ## id ## _fini }; \
   __attribute__((constructor)) void kmod_ ## id ## _register() { \
     int r = pd_kmod_register(kmod_##id); \
     if (r < 0) printk("Failed to register kernel module %s: %d", #id, -r); \

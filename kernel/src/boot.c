@@ -57,8 +57,8 @@ int main(int argc, char** argv) {
   file_t cmdline_fd = fs_open("/cd/cmdline.txt", O_RDONLY);
   if (!cmdline_fd) cmdline_fd = fs_open("/rd/cmdline", O_RDONLY);
   if (!cmdline_fd) cmdline_fd = fs_open("/rd/boot/cmdline", O_RDONLY);
-  if (!cmdline_fd) cmdline_fd = fs_open("/vmu/cmdline", O_RDONLY);
-  if (!cmdline_fd) cmdline_fd = fs_open("/vmu/boot/cmdline", O_RDONLY);
+  if (!cmdline_fd) cmdline_fd = fs_open("/vmu/a1/cmdline", O_RDONLY);
+  if (!cmdline_fd) cmdline_fd = fs_open("/vmu/a1/boot/cmdline", O_RDONLY);
   if (cmdline_fd) {
     char* cmdline = malloc(fs_total(cmdline_fd));
     if (cmdline == NULL) {
@@ -75,13 +75,30 @@ int main(int argc, char** argv) {
   fs_iso9600_shutdown();
 #endif
 
+  {
+    size_t i;
+    for (i = 0; i < pd_fs_getcount(); i++) {
+      pd_fs_t* fs = pd_fs_fromindex(i);
+      if (fs->type != PD_FS_PHYS) continue;
+      size_t x;
+      for (x = 0; x < pd_blkdev_getcount(); x++) {
+        pd_blkdev_t* blkdev = pd_blkdev_fromindex(x);
+        r = pd_fs_mount(fs, blkdev, NULL, "/", 0, NULL);
+        if (r < 0) continue;
+      }
+    }
+
+    if (pd_mountpoint_fromtarget("/") == NULL) {
+      printk("Failed to mount root filesystem");
+      return 0;
+    }
+  }
+
   r = pd_kmods_init();
   if (r < 0) {
     printk("Failed to load kernel modules: %d", -r);
     return 0;
   }
-
-  // TODO: load disk
 
   pd_inode_t* init_inode;
   r = pd_resolve_path(&init_inode, "/init");

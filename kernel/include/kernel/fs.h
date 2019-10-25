@@ -10,8 +10,8 @@
 #define PD_FS_PHYS 2
 
 /**
- * PowerDream Filesystem
- */
+  * PowerDream Filesystem
+  */
 typedef struct pd_fs {
   /* Filesystem list handle */
   PD_SLIST_ENTRY(struct pd_fs) f_list;
@@ -45,8 +45,8 @@ typedef struct pd_fs {
 } pd_fs_t;
 
 /**
- * PowerDream Mount Point
- */
+  * PowerDream Mount Point
+  */
 typedef struct pd_mountpoint {
   /* Mount point list handle */
   PD_SLIST_ENTRY(struct pd_mountpoint) m_list;
@@ -71,105 +71,120 @@ typedef struct pd_mountpoint {
 } pd_mountpoint_t;
 
 /**
- * Gets a filesystem by its name
- *
- * @param[in] name The name of the filesystem to get
- * @return A filesystem or NULL if it cannot be found
- */
+  * Get the number of registered filesystems
+  *
+  * @return A number
+  */
+size_t pd_fs_getcount();
+
+/**
+  * Gets a filesystem by its index
+  *
+  * @param[in] i The index of the filesystem to get
+  * @return A filesystem or NULL if it cannot be found
+  */
+pd_fs_t* pd_fs_fromindex(size_t i);
+
+/**
+  * Gets a filesystem by its name
+  *
+  * @param[in] name The name of the filesystem to get
+  * @return A filesystem or NULL if it cannot be found
+  */
 pd_fs_t* pd_fs_fromname(const char* name);
 
 /**
- * Get a mount point by its target path
- *
- * @param[in] target The target path
- * @return A mount point or NULL if it cannot be found
- */
+  * Get a mount point by its target path
+  *
+  * @param[in] target The target path
+  * @return A mount point or NULL if it cannot be found
+  */
 pd_mountpoint_t* pd_mountpoint_fromtarget(const char* target);
 
 /**
- * Get a mount point by its device
- *
- * @param[in] dev The device name
- * @return A mount point or NULL if it cannot be found
- */
+  * Get a mount point by its device
+  *
+  * @param[in] dev The device name
+  * @return A mount point or NULL if it cannot be found
+  */
 pd_mountpoint_t* pd_mountpoint_fromdev(const char* dev);
 
 /**
- * Get a mount point by its source
- *
- * @param[in] source The source path
- * @reutnr A mount pount or NULL if it cannot be found
- */
+  * Get a mount point by its source
+  *
+  * @param[in] source The source path
+  * @reutnr A mount pount or NULL if it cannot be found
+  */
 pd_mountpoint_t* pd_mountpoint_fromsrc(const char* source);
 
 /**
- * Resolves a global path
- *
- * @param[out] inode The pointer to store the resolved inode
- * @param[in] path The path to resolve
- * @return A negative errno number if errors, 0 on success
- */
+  * Resolves a global path
+  *
+  * @param[out] inode The pointer to store the resolved inode
+  * @param[in] path The path to resolve
+  * @return A negative errno number if errors, 0 on success
+  */
 int pd_resolve_path(pd_inode_t** inode, const char* path);
 
 /**
- * Register a new filesystem
- *
- * @param[in] fs The filesystem to register.
- * @return 0 on success or a negative errno code on failure.
- */
+  * Register a new filesystem
+  *
+  * @param[in] fs The filesystem to register.
+  * @return 0 on success or a negative errno code on failure.
+  */
 int pd_fs_register(pd_fs_t* fs);
 
 /**
- * Unregisters a filesystem
- *
- * @param[in] fs The filesystem to unregister.
- * @return 0 on success or a negative errno code on failure.
- */
+  * Unregisters a filesystem
+  *
+  * @param[in] fs The filesystem to unregister.
+  * @return 0 on success or a negative errno code on failure.
+  */
 int pd_fs_unregister(pd_fs_t* fs);
 
 /**
- * Mount a filesystem
- *
- * @param[in] fs The filesystem to mount
- * @param[in] dev The block device to mount, can be NULL
- * @param[in] source The source to mount, can be NULL
- * @param[in] target The resulting mount path
- * @param[in] flags The mount flags
- * @param[in] data Data to send to the filesystem
- * @return 0 on success, negative errno on failure
- */
+  * Mount a filesystem
+  *
+  * @param[in] fs The filesystem to mount
+  * @param[in] dev The block device to mount, can be NULL
+  * @param[in] source The source to mount, can be NULL
+  * @param[in] target The resulting mount path
+  * @param[in] flags The mount flags
+  * @param[in] data Data to send to the filesystem
+  * @return 0 on success, negative errno on failure
+  */
 int pd_fs_mount(pd_fs_t* fs, pd_blkdev_t* dev, const char* source, const char* target, unsigned long flags, const void* data);
 
 /**
- * Unmounts a filesystem
- *
- * @param[in] fs The filesystem to unmount
- * @param[in] target The mountpoint to remove
- * @return 0 on success, negative errno on failure
- */
+  * Unmounts a filesystem
+  *
+  * @param[in] fs The filesystem to unmount
+  * @param[in] target The mountpoint to remove
+  * @return 0 on success, negative errno on failure
+  */
 int pd_fs_umount(pd_fs_t* fs, const char* target);
 
 /**
- * Mounts a filesystem
- *
- * @param[in] source The source of the mount point
- * @param[in] target The target of the mount point
- * @param[in] fstype The type of filesystem to mount
- * @param[in] flags The mount flags
- * @param[in] data Some data to use when mounting
- * @return 0 on success, negative errno on failure.
- */
+  * Mounts a filesystem
+  *
+  * @param[in] source The source of the mount point
+  * @param[in] target The target of the mount point
+  * @param[in] fstype The type of filesystem to mount
+  * @param[in] flags The mount flags
+  * @param[in] data Some data to use when mounting
+  * @return 0 on success, negative errno on failure.
+  */
 int mount(const char* source, const char* target, const char* fstype, unsigned long flags, const void* data);
 
 /**
- * Unmount a filesystem
- *
- * @param[in] target The mount point target to remove.
- * @return 0 on success, negative errno on failure.
- */
+  * Unmount a filesystem
+  *
+  * @param[in] target The mount point target to remove.
+  * @return 0 on success, negative errno on failure.
+  */
 int umount(const char* target);
 
 /**
- * Initialize the filesystems
- */
+  * Initialize the filesystems
+  */
 void pd_fs_init();
