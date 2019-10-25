@@ -44,6 +44,8 @@ pd_mountpoint_t* pd_mountpoint_fromsrc(const char* source) {
 }
 
 int pd_resolve_path(pd_inode_t** inode, const char* path) {
+  while (path[0] == '/') return pd_resolve_path(inode, path + 1);
+  while (path[strlen(path) - 1] == '/') ((char*)path)[strlen(path) - 1] = 0;
   pd_mountpoint_t* rootmp = pd_mountpoint_fromtarget("/");
   if (rootmp == NULL) return -ENOENT;
   pd_mountpoint_t* mp = NULL;

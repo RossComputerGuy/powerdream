@@ -9,7 +9,10 @@
 #define SYS_mount 5
 #define SYS_umount 6
 
-#define SYSCALL_MAX 7
+#define SYS_sysconf 7
+#define SYS_uname 8
+
+#define SYSCALL_MAX 9
 
 /**
  * Setup the system calls

@@ -2,6 +2,7 @@
 #include <kernel/fs.h>
 #include <kernel/process.h>
 #include <kernel/syscall.h>
+#include <kernel/system.h>
 #include <string.h>
 
 static void* syscall_table[SYSCALL_MAX];
@@ -28,6 +29,9 @@ void pd_syscalls_init() {
 
   syscall_table[SYS_mount] = mount;
   syscall_table[SYS_umount] = umount;
+
+  syscall_table[SYS_sysconf] = sysconf;
+  syscall_table[SYS_uname] = uname;
 
   /* Set the system call handler */
   irq_set_handler(EXC_IRQ0, handle_syscall);

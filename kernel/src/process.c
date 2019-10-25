@@ -10,7 +10,7 @@
 PD_SLIST_HEAD(proclist, pd_process_t);
 TAILQ_HEAD(procqueue, pd_process);
 
-static pid_t next_pid = 0;
+static pid_t next_pid = 1;
 static pd_process_t* curr_proc = NULL;
 static pd_process_t* idle_proc = NULL;
 static struct proclist processes;
@@ -29,6 +29,12 @@ static void proc_handle_irq(irq_t source, irq_context_t* context) {
   }
 }
 
+static void proc_handle_timer(irq_context_t* context) {
+  uint64_t now = timer_ms_gettime64();
+  pd_process_schedule(0, now);
+  timer_primary_wakeup(1000 / HZ);
+}
+
 static void proc_start(pid_t pid, int (*entry)(int argc, char** argv), int argc, char** argv) {
   pd_process_t* proc = pd_process_frompid(pid);
   mmu_switch_context(proc->mem);
@@ -38,6 +44,7 @@ static void proc_start(pid_t pid, int (*entry)(int argc, char** argv), int argc,
 
 pid_t pd_process_create(pd_process_t** proc, int (*entry)(int argc, char** argv), int argc, char** argv) {
   if (((*proc) = malloc(sizeof(pd_process_t))) == NULL) return -ENOMEM;
+  if (curr_proc->children_count + 1 == CHILD_MAX) return -ECHILD;
   memset((*proc), 0, sizeof(pd_process_t));
 
   int oldirq = irq_disable();
@@ -58,7 +65,7 @@ pid_t pd_process_create(pd_process_t** proc, int (*entry)(int argc, char** argv)
   }
   
   (*proc)->mem = mmu_context_create(1 + (*proc)->id);
-  (*proc)->id = next_pid++;
+  (*proc)->id = curr_proc->child[curr_proc->children_count++] = next_pid++;
   (*proc)->state = PD_PROC_READY;
 
   /* TODO: setup context */
@@ -94,9 +101,11 @@ pid_t pd_process_create(pd_process_t** proc, int (*entry)(int argc, char** argv)
 void pd_process_exit(pd_process_t** proc, int status) {
   irq_disable();
 
-  pd_process_t* child = NULL;
-  PD_SLIST_FOREACH(child, &processes, p_list) {
-    if (child->parent_pid == (*proc)->id) pd_process_exit(&child, status);
+  size_t i;
+  for (i = 0; i < (*proc)->children_count; i++) {
+    pd_process_t* child = pd_process_frompid((*proc)->child[i]);
+    if (child == NULL) continue;
+    pd_process_kill(&child, SIGKILL);
   }
 
   (*proc)->exitstat = status;
@@ -105,7 +114,16 @@ void pd_process_exit(pd_process_t** proc, int status) {
   sem_signal(&reap_sem);
 
   pd_process_t* parent_proc = pd_process_frompid((*proc)->parent_pid);
-  if (parent_proc != NULL && (*proc)->parent_pid != 0) pd_process_kill(&parent_proc, SIGCHLD);
+  if (parent_proc != NULL && (*proc)->parent_pid != 0) {
+    for (i = 0; i < parent_proc->children_count; i++) {
+      if (parent_proc->child[i] == (*proc)->id) {
+        parent_proc->child[i] = 0;
+        parent_proc->children_count--;
+        break;
+      }
+    }
+    pd_process_kill(&parent_proc, SIGCHLD);
+  }
 
   thd_block_now(&(*proc)->context);
 }
@@ -137,6 +155,7 @@ pd_process_t* pd_process_getcurr() {
 
 int pd_process_sigret(pd_process_t** proc) {
   memcpy(&(*proc)->context, &(*proc)->saved_context, sizeof(irq_context_t));
+  // TODO: if a SIGKILL was triggered then we should exit here
   return 0;
 }
 
@@ -150,6 +169,7 @@ int pd_process_kill(pd_process_t** proc, int sig) {
       else memcpy(&(*proc)->saved_context, &(*proc)->context, sizeof(irq_context_t));
       (*proc)->context.pc = (uint32_t)(*proc)->signal_handlers[sig];
     }
+    // TODO: don't call this if a signal handler was installed
     pd_process_exit(proc, -SIGKILL);
   } else if ((*proc)->signal_handlers[sig] == 0 && (sig == SIGILL || sig == SIGFPE)) {
     pd_process_exit(proc, -sig);
@@ -271,9 +291,26 @@ void pd_process_schedule(int fol, uint64_t now) {
   irq_set_context(&curr_proc->context);
 }
 
+void pd_process_cleanup() {
+  sem_wait(&reap_sem);
+
+  pd_process_t* proc = NULL;
+  PD_SLIST_FOREACH(proc, &processes, p_list) {
+    if (proc->state == PD_PROC_ZOMBIE) {
+      pd_process_destroy(&proc);
+      break;
+    }
+  }
+}
+
 void pd_process_init() {
-  irq_set_handler(EXC_ILLEGAL_INSTR, proc_handle_irq);
-  irq_set_handler(EXC_FPU, proc_handle_irq);
+  curr_proc = NULL;
+  sem_init(&reap_sem, 0);
+  genwait_init();
   PD_SLIST_INIT(&processes);
   TAILQ_INIT(&run_queue);
+  irq_set_handler(EXC_ILLEGAL_INSTR, proc_handle_irq);
+  irq_set_handler(EXC_FPU, proc_handle_irq);
+  timer_primary_set_callback(proc_handle_timer);
+  timer_primary_wakeup(1000 / HZ);
 }

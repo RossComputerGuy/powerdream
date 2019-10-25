@@ -1,11 +1,18 @@
 #pragma once
 
-struct utsname {
-  char sysname[128];
-  char nodename[128];
-  char release[128];
-  char machine[128];
-};
+#include <sys/utsname.h>
+
+#define _SC_CHILD_MAX 1
+#define _SC_OPEN_MAX 2
+#define _SC_PAGESIZE 3
+
+/**
+ * Gets the system configuration value
+ *
+ * @param[in] name The system configuration to get
+ * @return The value of the system configuration
+ */
+long sysconf(int name);
 
 /**
   * Get the system name and information

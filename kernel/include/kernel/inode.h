@@ -13,6 +13,7 @@
 #define PD_NODE_SOCK (7 << 0)
 
 #define S_IS(m, n) (((m) & PD_NODE_##n) == PD_NODE_##n)
+#define S_ISFILE(m) S_IS((m), FILE)
 #define S_ISDIR(m) S_IS((m), DIR)
 
 /**

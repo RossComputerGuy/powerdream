@@ -48,6 +48,12 @@ typedef struct pd_process {
   /* The process exist status */
   int exitstat;
 
+  /* The children PID's */
+  pid_t child[CHILD_MAX];
+
+  /* The number of children in a process */
+  size_t children_count;
+
   /* Process ID */
   pid_t id;
 
@@ -208,6 +214,11 @@ void pd_proces_removerunnable(pd_process_t* proc);
  * @param[in] now The current timer value
  */
 void pd_process_schedule(int fol, uint64_t now);
+
+/**
+ * Cleans up any zombie processes, this is called automatically once the init program has started
+ */
+void pd_process_cleanup();
 
 /**
  * Initialize multiprocessing
