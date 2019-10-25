@@ -6,6 +6,7 @@
 #include <kernel/fs.h>
 #include <kernel/module.h>
 #include <malloc.h>
+#include <stdio.h>
 
 static pd_fs_t* devfs = NULL;
 
@@ -20,12 +21,14 @@ static int devfs_sync(pd_inode_t* inode) {
   if (devfs_blkcnt != pd_blkdev_getcount()) {
     pd_inode_t** inodes = malloc(sizeof(pd_inode_t) * pd_blkdev_getcount());
     if (inodes == NULL) return -ENOMEM;
-    for (size_t i = 0; i < pd_blkdev_getcount(); i++) {
+    size_t i;
+    for (i = 0; i < pd_blkdev_getcount(); i++) {
       pd_blkdev_t* blkdev = pd_blkdev_fromindex(i);
-      pd_device_t* device = pd_dev_fromname(blkdev->name);
+      pd_dev_t* device = pd_dev_fromname(blkdev->name);
       int found = 0;
       if (devfs_blocks != NULL) {
-        for (size_t x = 0; x < devfs_blkcnt; x++) {
+        size_t x;
+        for (x = 0; x < devfs_blkcnt; x++) {
           if (devfs_blocks[x]->impl == blkdev) {
             inodes[i] = devfs_blocks[x];
             found = 1;
@@ -59,15 +62,17 @@ static int devfs_sync(pd_inode_t* inode) {
   }
 
   /* Character devices */
-  if (dev_chrcnt != pd_chardev_getcount()) {
+  if (devfs_chrcnt != pd_chardev_getcount()) {
     pd_inode_t** inodes = malloc(sizeof(pd_inode_t) * pd_chardev_getcount());
     if (inodes == NULL) return -ENOMEM;
-    for (size_t i = 0; i < pd_chardev_getcount(); i++) {
+    size_t i;
+    for (i = 0; i < pd_chardev_getcount(); i++) {
       pd_chardev_t* chardev = pd_chardev_fromindex(i);
-      pd_device_t* device = pd_dev_fromname(chardev->name);
+      pd_dev_t* device = pd_dev_fromname(chardev->name);
       int found = 0;
       if (devfs_chars != NULL) {
-        for (size_t x = 0; x < devfs_chrcnt; x++) {
+        size_t x;
+        for (x = 0; x < devfs_chrcnt; x++) {
           if (devfs_chars[x]->impl == chardev) {
             inodes[i] = devfs_chars[x];
             found = 1;
@@ -150,4 +155,4 @@ static void devfs_fini() {
   free(devfs);
 }
 
-PD_MODDEF(devfs) = { "devfs", "Tristan Ross", "GPL-3.0", "v0.1.0", .init = devfs_init, .fini = devfs_fini };
+PD_MODDEF(devfs, "devfs", "Tristan Ross", "GPL-3.0", "v0.1.0");

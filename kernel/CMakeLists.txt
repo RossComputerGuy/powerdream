@@ -2,17 +2,16 @@
 
 cmake_minimum_required(VERSION 3.15)
 set(CMAKE_TOOLCHAIN_FILE toolchain.cmake)
+
+if (NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
 project(pd-kernel C ASM)
 set(PROJECT_VERSION "0.1.0")
 
 option(COMPILED_CMDLINE "Compile the kernel command line options into the binary instead of loading from a file" OFF)
 
-if (NOT SERIAL_BAUD)
-  set(SERIAL_BAUD 57600)
-endif()
-if (NOT SERIAL_FIFO)
-  set(SERIAL_FIFO 1)
-endif()
 if (COMPILED_CMDLINE)
   if (NOT CMDLINE)
     set(CMDLINE "")
@@ -25,10 +24,11 @@ configure_file("${PROJECT_SOURCE_DIR}/data/config.h.in" "${PROJECT_BINARY_DIR}/k
 include_directories("${PROJECT_BINARY_DIR}")
 include_directories("${PROJECT_SOURCE_DIR}/include")
 
-add_subdirectory("${PROJECT_SOURCE_DIR}/fs")
+set(FILESYSTEMS "${PROJECT_SOURCE_DIR}/fs/devfs.c")
+
 add_compile_options("-Werror=implicit-function-declaration")
-add_link_options("-T${PROJECT_SOURCE_DIR}/data/kernel.ld")
 add_executable(kernel
+  ${FILESYSTEMS}
   "${PROJECT_SOURCE_DIR}/src/dev/block.c"
   "${PROJECT_SOURCE_DIR}/src/dev/char.c"
   "${PROJECT_SOURCE_DIR}/src/dev/tty.c"
@@ -36,9 +36,8 @@ add_executable(kernel
   "${PROJECT_SOURCE_DIR}/src/device.c"
   "${PROJECT_SOURCE_DIR}/src/fs.c"
   "${PROJECT_SOURCE_DIR}/src/inode.c"
+  "${PROJECT_SOURCE_DIR}/src/klog.c"
   "${PROJECT_SOURCE_DIR}/src/module.c"
   "${PROJECT_SOURCE_DIR}/src/process.c"
   "${PROJECT_SOURCE_DIR}/src/syscall.c"
   "${PROJECT_SOURCE_DIR}/src/system.c")
-add_dependencies(kernel kernel-fs)
-target_link_libraries(kernel kernel-fs)

@@ -1,9 +1,10 @@
-#include <arch/panic.h>
+#include <arch/arch.h>
 #include <kernel/dev/block.h>
 #include <kernel/dev/char.h>
 #include <kernel/dev/tty.h>
 #include <kernel/device.h>
 #include <kernel/fs.h>
+#include <kernel/klog.h>
 #include <kernel/module.h>
 #include <kernel/process.h>
 #include <kernel/syscall.h>
@@ -11,22 +12,30 @@
 #include <stdio.h>
 
 int main(int argc, char** argv) {
-  printf("PowerDream Kernel v"PD_KERNEL_VERSION" - (C) 2019 Tristan Ross (The Computer Guy)\n");
-  printf("Compiled on "__DATE__", "__TIME__" by "PD_COMPILE_USER"\n");
+  printk("PowerDream Kernel v"PD_KERNEL_VERSION" - (C) 2019 Tristan Ross (The Computer Guy)"
+#if PD_BUILD_TYPE != Release
+  " - Compiled on "__DATE__", "__TIME__" by "PD_COMPILE_USER
+#endif
+  , 0);
 
   pd_dev_init();
   pd_blkdev_init();
-  pd_chardev_init();
+  int r = pd_chardev_init();
+  if (r < 0) {
+    printk("Failed to initialize character devices: %d", -r);
+    return 0;
+  }
   pd_fs_init();
   pd_process_init();
   pd_syscalls_init();
 
-  printf("Bootstrap completed, 2nd stage of kernel boot process starting\n");
+  printk("Bootstrap completed, 2nd stage of kernel boot process starting", 0);
 
-  int r = pd_kmods_init();
-  if (r < 0) arch_panic("Failed to load kernel modules");
-
-  printf("%d kernel modules loaded\n", pd_getmodcount());
+  r = pd_kmods_init();
+  if (r < 0) {
+    printk("Failed to load kernel modules: %d", -r);
+    return 0;
+  }
 
   // TODO: read boot parameters
   // TODO: load ramdisk

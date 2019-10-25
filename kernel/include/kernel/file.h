@@ -20,7 +20,7 @@ struct dirent {
  * PowerDream File Operations
  */
 typedef struct {
-  int (*sync)(struct pd_inode_t* inode);
+  int (*sync)(struct pd_inode* inode);
   int (*open)(struct pd_inode* inode, struct pd_file* file);
   int (*close)(struct pd_inode* inode, struct pd_file* file);
   size_t (*read)(struct pd_inode* inode, struct pd_file* file, char* buff, size_t size);

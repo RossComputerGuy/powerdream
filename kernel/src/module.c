@@ -1,27 +1,29 @@
 #include <kernel/error.h>
+#include <kernel/klog.h>
 #include <kernel/module.h>
+#include <malloc.h>
 #include <string.h>
 
-extern uint32_t modinfo_start;
-extern uint32_t modinfo_end;
+#define MODINFO_MAX 10
 
-#define MODCOUNT ((modinfo_end - modinfo_start) / sizeof(pd_modinfo_t))
-
-static int* mods_inited;
+static int mod_count = 0;
+static pd_modinfo_t modules[MODINFO_MAX];
+static int mods_inited[MODINFO_MAX];
 
 size_t pd_getmodcount() {
-  return MODCOUNT;
+  return mod_count;
 }
 
 pd_modinfo_t* pd_module_getinfo(size_t index) {
-  if (index > MODCOUNT) return NULL;
-  return (pd_modinfo_t*)(modinfo_start + (index * sizeof(pd_modinfo_t)));
+  if (index > mod_count) return NULL;
+  return &modules[index];
 }
 
 int pd_module_init(size_t i) {
   pd_modinfo_t* modinfo = pd_module_getinfo(i);
   if (modinfo == NULL) return -ENOENT;
   if (mods_inited[i]) return -EINVAL;
+  printk("Initializing kernel module %s", modinfo->name);
   int r = modinfo->init();
   if (r < 0) return r;
   mods_inited[i] = r;
@@ -37,11 +39,23 @@ int pd_module_fini(size_t i) {
   return 0;
 }
 
-int pd_kmods_init() {
-  mods_inited = malloc(sizeof(int) * MODCOUNT);
-  if (mods_inited == NULL) return -ENOMEM;
+int pd_kmod_register(pd_modinfo_t modinfo) {
+  if (mod_count + 1 == MODINFO_MAX) return -ENOMEM;
+  pd_modinfo_t* m = &modules[mod_count++];
+  strcpy((char*)m->name, modinfo.name);
+  strcpy((char*)m->author, modinfo.author);
+  strcpy((char*)m->license, modinfo.license);
+  strcpy((char*)m->version, modinfo.version);
+  m->init = modinfo.init;
+  m->fini = modinfo.fini;
+  return 0;
+}
 
-  for (size_t i = 0; i < MODCOUNT; i++) {
+int pd_kmods_init() {
+  memset(mods_inited, 0, sizeof(int) * MODINFO_MAX);
+
+  size_t i;
+  for (i = 0; i < mod_count; i++) {
     int r = pd_module_init(i);
     if (r < 0) {
       free(mods_inited);

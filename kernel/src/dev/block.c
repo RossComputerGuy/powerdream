@@ -14,7 +14,7 @@ static size_t blkdev_read(pd_inode_t* inode, pd_file_t* file, char* buff, size_t
   if (blkdev == NULL) return -ENODEV;
   if (blkdev->blkread == NULL) return -EIO;
 
-  int r = blkdev->blkread(blkdev, buff, blkdev->blksize * file->offset, size);
+  int r = blkdev->blkread(blkdev, buff, blkdev->blksz * file->offset, size);
   if (r < 0) return r;
 
   file->offset++;
@@ -27,7 +27,7 @@ static size_t blkdev_write(pd_inode_t* inode, pd_file_t* file, const char* buff,
   if (blkdev == NULL) return -ENODEV;
   if (blkdev->blkwrite == NULL) return -EIO;
 
-  int r = blkdev->blkwrite(blkdev, buff, blkdev->blksize * file->offset, size);
+  int r = blkdev->blkwrite(blkdev, buff, blkdev->blksz * file->offset, size);
   if (r < 0) return r;
 
   file->offset++;
@@ -42,7 +42,7 @@ pd_blkdev_t* pd_blkdev_fromindex(size_t i) {
   pd_blkdev_t* blkdev;
   size_t index = 0;
   PD_SLIST_FOREACH(blkdev, &blkdevs, b_list) {
-    if (index == i) return i;
+    if (index == i) return blkdev;
     index++;
   }
   return NULL;

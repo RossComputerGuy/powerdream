@@ -2,6 +2,7 @@
 #include <kernel/device.h>
 #include <kernel/error.h>
 #include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define DEV_NULL MKDEV(1, 0)
@@ -18,11 +19,12 @@ static size_t chardev_read(pd_inode_t* inode, pd_file_t* file, char* buff, size_
   if (chardev == NULL) return -ENODEV;
   if (chardev->dev == DEV_NULL) {
     memcpy(buff, 0, size);
-    return w;
+    return size;
   }
   if (chardev->dev == DEV_RANDOM) {
-    for (size_t i = 0; i < size; i++) buff[i] = rand();
-    return w;
+    size_t i;
+    for (i = 0; i < size; i++) buff[i] = rand();
+    return size;
   }
   if (chardev->read == NULL) return -EIO;
 
@@ -37,7 +39,7 @@ static size_t chardev_write(pd_inode_t* inode, pd_file_t* file, const char* buff
   pd_chardev_t* chardev = pd_chardev_fromname(inode->name);
   if (chardev == NULL) chardev = inode->impl;
   if (chardev == NULL) return -ENODEV;
-  if (chardev->dev == DEV_NULL) return w;
+  if (chardev->dev == DEV_NULL) return size;
   if (chardev->dev == DEV_RANDOM) return -EPERM;
   if (chardev->write == NULL) return -EIO;
 
@@ -56,7 +58,7 @@ static int chardev_ioctl(pd_inode_t* inode, pd_file_t* file, unsigned int reques
   return chardev->ioctl(chardev, file, request, argsize, arg);
 }
 
-int pd_chardev_fromindex() {
+int pd_chardev_getcount() {
   return chardev_count;
 }
 
@@ -79,7 +81,7 @@ pd_chardev_t* pd_chardev_fromname(const char* name) {
 }
 
 int pd_chardev_register(pd_chardev_t* chardev) {
-  if (pd_chardev_fromname(chardev->name) == NULL) return -EEXIST;
+  if (pd_chardev_fromname(chardev->name) != NULL) return -EEXIST;
 
   pd_dev_t* dev = malloc(sizeof(pd_dev_t));
   strcpy((char*)dev->name, chardev->name);
@@ -99,12 +101,11 @@ int pd_chardev_register(pd_chardev_t* chardev) {
   return 0;
 }
 
-#define DEF_CHARDEV(name, dev) { \
+#define DEF_CHARDEV(fname, idev) { \
   pd_chardev_t* chardev = malloc(sizeof(pd_chardev_t)); \
   if (chardev == NULL) return -ENOMEM; \
-  strcpy((char*)chardev->name, name); \
-  chardev->dev = dev; \
-
+  strcpy((char*)chardev->name, fname); \
+  chardev->dev = idev; \
   int r = pd_chardev_register(chardev); \
   if (r < 0) { \
     free(chardev); \
@@ -117,9 +118,9 @@ int pd_chardev_init() {
   PD_SLIST_INIT(&chardevs);
 
   /* null character device */
-  DEF_CHARDEV("null", DEV_NULL)
+  DEF_CHARDEV("null", DEV_NULL);
 
   /* random character device */
-  DEF_CHARDEV("random", DEV_RANDOM)
+  DEF_CHARDEV("random", DEV_RANDOM);
   return 0;
 }

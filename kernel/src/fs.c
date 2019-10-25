@@ -1,7 +1,8 @@
 #include <kernel/error.h>
 #include <kernel/fs.h>
-#include <malloc.h>
+#include <kernel/klog.h>
 #include <kernel/process.h>
+#include <malloc.h>
 #include <string.h>
 
 PD_SLIST_HEAD(filesystems, pd_fs_t);
@@ -57,13 +58,14 @@ int pd_resolve_path(pd_inode_t** inode, const char* path) {
 
 int pd_fs_register(pd_fs_t* fs) {
   if (pd_fs_fromname(fs->name) != NULL) return -EEXIST;
+  printk("Registering filesystem: %s", fs->name);
   PD_SLIST_INSERT_HEAD(&filesystems, fs, f_list);
   return 0;
 }
 
 int pd_fs_unregister(pd_fs_t* fs) {
   if (pd_fs_fromname(fs->name) == NULL) return -ENOENT;
-  PD_SLIT_REMOVE(&filesystems, fs, pd_fs_t, f_list);
+  PD_SLIST_REMOVE(&filesystems, fs, pd_fs_t, f_list);
   return 0;
 }
 
