@@ -18,7 +18,7 @@ char* pd_getcmdline() {
 }
 
 void pd_setcmdline(const char* str) {
-  cmdline = str;
+  cmdline = (char*)str;
 }
 
 int pd_getcmdline_hasarg(const char* arg) {
