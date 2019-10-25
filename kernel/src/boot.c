@@ -12,9 +12,11 @@
 #include <kernel/syscall.h>
 #include <kernel/system.h>
 #include <kernel-config.h>
+#ifndef PD_COMPILED_CMDLINE
 #include <dc/fs_iso9660.h>
 #include <dc/fs_vmu.h>
 #include <kos/fs.h>
+#endif
 #include <malloc.h>
 #include <stdio.h>
 
@@ -71,7 +73,7 @@ int main(int argc, char** argv) {
     }
   } else printk("Command line arguments file not found on the CD-ROM, VMU, and ramdisk", 0);
   fs_vmu_shutdown();
-  fs_iso9600_shutdown();
+  fs_iso9660_shutdown();
 #endif
 
   {
