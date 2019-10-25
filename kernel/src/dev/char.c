@@ -31,7 +31,7 @@ static size_t chardev_read(pd_inode_t* inode, pd_file_t* file, char* buff, size_
   size_t r = chardev->read(chardev, file, file->offset, buff, size);
   if (r < 0) return r;
 
-  file->offset += r;
+  if (file != NULL) file->offset += r;
   return r;
 }
 
@@ -46,7 +46,7 @@ static size_t chardev_write(pd_inode_t* inode, pd_file_t* file, const char* buff
   size_t w = chardev->write(chardev, file, file->offset, buff, size);
   if (w < 0) return w;
 
-  file->offset += w;
+  if (file != NULL) file->offset += w;
   return w;
 }
 

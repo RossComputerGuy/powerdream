@@ -5,6 +5,44 @@
 #include <kernel-config.h>
 #include <string.h>
 
+static char* cmdline
+#ifdef PD_COMPILED_CMDLINE
+= PD_CMDLINE;
+#else
+= NULL;
+#endif
+
+char* pd_getcmdline() {
+  return cmdline;
+}
+
+int pd_getcmdline_hasarg(const char* arg) {
+  if (cmdline == NULL) return 0;
+  char* p = strtok(cmdline, " ");
+  while (p != NULL) {
+    if (!strncmp(p, arg, strlen(arg))) return 1;
+    p = strtok(NULL, " ");
+  }
+  return 0;
+}
+
+char* pd_getcmdline_arg(const char* arg) {
+  if (cmdline == NULL) return NULL;
+  char* p = strtok(cmdline, " ");
+  while (p != NULL) {
+    if (!strncmp(p, arg, strlen(arg))) {
+      size_t size = strlen(arg);
+      if (p[size] == '=') size++;
+      char* str = malloc(size);
+      if (str == NULL) return NULL;
+      strcpy(str, p + size);
+      return str;
+    }
+    p = strtok(NULL, " ");
+  }
+  return NULL;
+}
+
 long sysconf(int name) {
   switch (name) {
     case _SC_CHILD_MAX: return CHILD_MAX;

@@ -17,7 +17,7 @@ static size_t blkdev_read(pd_inode_t* inode, pd_file_t* file, char* buff, size_t
   int r = blkdev->blkread(blkdev, buff, blkdev->blksz * file->offset, size);
   if (r < 0) return r;
 
-  file->offset++;
+  if (file != NULL) file->offset++;
   return 0;
 }
 
@@ -30,7 +30,7 @@ static size_t blkdev_write(pd_inode_t* inode, pd_file_t* file, const char* buff,
   int r = blkdev->blkwrite(blkdev, buff, blkdev->blksz * file->offset, size);
   if (r < 0) return r;
 
-  file->offset++;
+  if (file != NULL) file->offset++;
   return 0;
 }
 

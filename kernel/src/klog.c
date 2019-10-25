@@ -4,8 +4,6 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#define KLOG_PAD 3
-
 int pd_klog_printf(const char* format, ...) {
   va_list ap;
   va_start(ap, format);

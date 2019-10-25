@@ -11,6 +11,11 @@
 #include <kernel/process.h>
 #include <kernel/syscall.h>
 #include <kernel-config.h>
+#ifndef PD_COMPILED_CMDLINE
+#include <dc/fs_iso9660.h>
+#include <dc/fs_vmu.h>
+#include <kos/fs.h>
+#endif
 #include <malloc.h>
 #include <stdio.h>
 
@@ -46,13 +51,36 @@ int main(int argc, char** argv) {
 
   printk("Bootstrap completed, 2nd stage of kernel boot process starting", 0);
 
+#ifndef PD_COMPILED_CMDLINE
+  fs_iso9660_init();
+  fs_vmu_init();
+  file_t cmdline_fd = fs_open("/cd/cmdline.txt", O_RDONLY);
+  if (!cmdline_fd) cmdline_fd = fs_open("/rd/cmdline", O_RDONLY);
+  if (!cmdline_fd) cmdline_fd = fs_open("/rd/boot/cmdline", O_RDONLY);
+  if (!cmdline_fd) cmdline_fd = fs_open("/vmu/cmdline", O_RDONLY);
+  if (!cmdline_fd) cmdline_fd = fs_open("/vmu/boot/cmdline", O_RDONLY);
+  if (cmdline_fd) {
+    char* cmdline = malloc(fs_total(cmdline_fd));
+    if (cmdline == NULL) {
+      printk("Failed to allocate RAM for the command line: %d bytes needed", fd_total(cmdline_fd));
+      fs_close(cmdline_fd);
+    } else {
+      memset(cmdline, 0, fs_total(cmdline_fd));
+      fs_read(cmdline_fd, cmdline, fs_total(cmdline_fd));
+      pd_setcmdline(cmdline);
+      fs_close(cmdline_fd);
+    }
+  } else printk("Command line arguments file not found on the CD-ROM, VMU, and ramdisk");
+  fs_vmu_shutdown();
+  fs_iso9600_shutdown();
+#endif
+
   r = pd_kmods_init();
   if (r < 0) {
     printk("Failed to load kernel modules: %d", -r);
     return 0;
   }
 
-  // TODO: read boot parameters
   // TODO: load disk
 
   pd_inode_t* init_inode;
