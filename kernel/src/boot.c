@@ -10,6 +10,7 @@
 #include <kernel/module.h>
 #include <kernel/process.h>
 #include <kernel/syscall.h>
+#include <kernel/system.h>
 #include <kernel-config.h>
 #ifndef PD_COMPILED_CMDLINE
 #include <dc/fs_iso9660.h>
@@ -62,7 +63,7 @@ int main(int argc, char** argv) {
   if (cmdline_fd) {
     char* cmdline = malloc(fs_total(cmdline_fd));
     if (cmdline == NULL) {
-      printk("Failed to allocate RAM for the command line: %d bytes needed", fd_total(cmdline_fd));
+      printk("Failed to allocate RAM for the command line: %d bytes needed", fs_total(cmdline_fd));
       fs_close(cmdline_fd);
     } else {
       memset(cmdline, 0, fs_total(cmdline_fd));
@@ -70,7 +71,7 @@ int main(int argc, char** argv) {
       pd_setcmdline(cmdline);
       fs_close(cmdline_fd);
     }
-  } else printk("Command line arguments file not found on the CD-ROM, VMU, and ramdisk");
+  } else printk("Command line arguments file not found on the CD-ROM, VMU, and ramdisk", 0);
   fs_vmu_shutdown();
   fs_iso9600_shutdown();
 #endif
@@ -89,7 +90,7 @@ int main(int argc, char** argv) {
     }
 
     if (pd_mountpoint_fromtarget("/") == NULL) {
-      printk("Failed to mount root filesystem");
+      printk("Failed to mount root filesystem", 0);
       return 0;
     }
   }
