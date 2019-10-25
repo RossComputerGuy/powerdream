@@ -60,11 +60,12 @@ int main(int argc, char** argv) {
   if (!cmdline_fd) cmdline_fd = fs_open("/rd/boot/cmdline", O_RDONLY);
   if (!cmdline_fd) cmdline_fd = fs_open("/vmu/a1/cmdline", O_RDONLY);
   if (!cmdline_fd) cmdline_fd = fs_open("/vmu/a1/boot/cmdline", O_RDONLY);
-  if (cmdline_fd) {
+  if (cmdline_fd && fs_total(cmdline_fd) > 0) {
     char* cmdline = malloc(fs_total(cmdline_fd));
     if (cmdline == NULL) {
       printk("Failed to allocate RAM for the command line: %d bytes needed", fs_total(cmdline_fd));
       fs_close(cmdline_fd);
+      return 0;
     } else {
       memset(cmdline, 0, fs_total(cmdline_fd));
       fs_read(cmdline_fd, cmdline, fs_total(cmdline_fd));
