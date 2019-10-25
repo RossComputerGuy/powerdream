@@ -17,6 +17,10 @@ char* pd_getcmdline() {
   return cmdline;
 }
 
+void pd_setcmdline(const char* str) {
+  cmdline = str;
+}
+
 int pd_getcmdline_hasarg(const char* arg) {
   if (cmdline == NULL) return 0;
   char* p = strtok(cmdline, " ");
