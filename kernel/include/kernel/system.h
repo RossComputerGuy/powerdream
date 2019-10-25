@@ -2,9 +2,9 @@
 
 #include <sys/utsname.h>
 
-#define _SC_CHILD_MAX 1
-#define _SC_OPEN_MAX 2
-#define _SC_PAGESIZE 3
+#define PD_SC_CHILD_MAX 1
+#define PD_SC_OPEN_MAX 2
+#define PD_SC_PAGESIZE 3
 
 /**
   * Set the command line arguments for the kernel
