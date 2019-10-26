@@ -53,13 +53,14 @@ int main(int argc, char** argv) {
   printk("Bootstrap completed, 2nd stage of kernel boot process starting", 0);
 
 #ifndef PD_COMPILED_CMDLINE
-  fs_iso9660_init();
+  /*fs_iso9660_init();
   fs_vmu_init();
   file_t cmdline_fd = fs_open("/cd/cmdline.txt", O_RDONLY);
   if (cmdline_fd == FILEHND_INVALID) cmdline_fd = fs_open("/rd/cmdline", O_RDONLY);
   if (cmdline_fd == FILEHND_INVALID) cmdline_fd = fs_open("/rd/boot/cmdline", O_RDONLY);
   if (cmdline_fd == FILEHND_INVALID) cmdline_fd = fs_open("/vmu/a1/cmdline", O_RDONLY);
   if (cmdline_fd == FILEHND_INVALID) cmdline_fd = fs_open("/vmu/a1/boot/cmdline", O_RDONLY);
+  printf("fd = %d\n", cmdline_fd);
   if (cmdline_fd != FILEHND_INVALID) {
     char* cmdline = malloc(fs_total(cmdline_fd));
     if (cmdline == NULL) {
@@ -74,7 +75,8 @@ int main(int argc, char** argv) {
     }
   } else printk("Command line arguments file not found on the CD-ROM, VMU, and ramdisk", 0);
   fs_vmu_shutdown();
-  fs_iso9660_shutdown();
+  fs_iso9660_shutdown();*/
+#warning "Command line arguments file loading has been disabled temproarily as its unstable"
 #endif
 
   {
