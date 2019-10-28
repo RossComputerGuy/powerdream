@@ -79,15 +79,25 @@ int main(int argc, char** argv) {
 #warning "Command line arguments file loading has been disabled temproarily as its unstable"
 #endif
 
+  r = pd_kmods_init();
+  if (r < 0) {
+    printk("Failed to load kernel modules: %d", -r);
+    return 0;
+  }
+
   {
     size_t i;
     for (i = 0; i < pd_fs_getcount(); i++) {
       pd_fs_t* fs = pd_fs_fromindex(i);
-      if (fs->type != PD_FS_PHYS) continue;
-      size_t x;
-      for (x = 0; x < pd_blkdev_getcount(); x++) {
-        pd_blkdev_t* blkdev = pd_blkdev_fromindex(x);
-        r = pd_fs_mount(fs, blkdev, NULL, "/", 0, NULL);
+      if (fs->type == PD_FS_PHYS) {
+        size_t x;
+        for (x = 0; x < pd_blkdev_getcount(); x++) {
+          pd_blkdev_t* blkdev = pd_blkdev_fromindex(x);
+          r = pd_fs_mount(fs, blkdev, NULL, "/", 0, NULL);
+          if (r < 0) continue;
+        }
+      } else if (fs->type == PD_FS_VIRT) {
+        r = pd_fs_mount(fs, NULL, NULL, "/", 0, NULL);
         if (r < 0) continue;
       }
     }
@@ -96,12 +106,6 @@ int main(int argc, char** argv) {
       printk("Failed to mount root filesystem", 0);
       return 0;
     }
-  }
-
-  r = pd_kmods_init();
-  if (r < 0) {
-    printk("Failed to load kernel modules: %d", -r);
-    return 0;
   }
 
   pd_inode_t* init_inode;

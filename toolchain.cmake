@@ -1,11 +1,9 @@
 set(CMAKE_SYSTEM_PROCESSOR sh4)
 
-set(CROSS_COMPILE sh4-nofpu-linux-)
-set(CMAKE_C_FLAGS "-nostdinc")
-set(CMAKE_LINK_FLAGS "-nostdlib" "-nostartfiles")
+set(CROSS_COMPILE kos-)
 
-find_program(CMAKE_ASM_COMPILER ${CROSS_COMPILE}gcc)
-find_program(CMAKE_C_COMPILER ${CROSS_COMPILE}gcc)
+find_program(CMAKE_ASM_COMPILER ${CROSS_COMPILE}cc)
+find_program(CMAKE_C_COMPILER ${CROSS_COMPILE}cc)
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)

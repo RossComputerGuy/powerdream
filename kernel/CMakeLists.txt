@@ -24,11 +24,21 @@ configure_file("${PROJECT_SOURCE_DIR}/data/config.h.in" "${PROJECT_BINARY_DIR}/k
 include_directories("${PROJECT_BINARY_DIR}")
 include_directories("${PROJECT_SOURCE_DIR}/include")
 
-set(FILESYSTEMS)
+add_custom_command(OUTPUT "${PROJECT_BINARY_DIR}/initrd.img"
+  COMMAND $ENV{KOS_GENROMFS} -f "${PROJECT_BINARY_DIR}/initrd.img" -d "${PROJECT_SOURCE_DIR}/initrd"
+  COMMENT "Generating initrd image")
+add_custom_command(OUTPUT "${PROJECT_BINARY_DIR}/initrd.o"
+  COMMAND $ENV{KOS_BASE}/utils/bin2o/bin2o "${PROJECT_BINARY_DIR}/initrd.img" initrd "${PROJECT_BINARY_DIR}/initrd.o"
+  COMMENT "Generating initrd object"
+  DEPENDS "${PROJECT_BINARY_DIR}/initrd.img")
+add_custom_target(initrd DEPENDS "${PROJECT_BINARY_DIR}/initrd.o")
+
+set(FILESYSTEMS "${PROJECT_SOURCE_DIR}/fs/initrd.c")
 
 add_compile_options("-Werror=implicit-function-declaration")
 add_executable(kernel
   ${FILESYSTEMS}
+  "${PROJECT_BINARY_DIR}/initrd.o"
   "${PROJECT_SOURCE_DIR}/src/dev/block.c"
   "${PROJECT_SOURCE_DIR}/src/dev/char.c"
   "${PROJECT_SOURCE_DIR}/src/dev/tty.c"
